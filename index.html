@@ -1,0 +1,1587 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3fbf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1613" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="비온뒤 맑음">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>비온뒤 맑음</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: home = plant grid + month calendar (two columns on wide screens), detail = hero + plant calendar + history */
+:root{
+  --bg:#f3fbf7; --surface:#ffffff; --fg:#10251d; --muted:#5a6f66; --line:#dcece4;
+  --lime:#d4f53c; --lime-soft:#f1fbcb; --on-lime:#10251d;
+  --mint:#6ee7c1; --mint-soft:#ddf8ee; --mint-deep:#0f8f68;
+  --idle:#e1eae6; --idle-fg:#6f8a80; --idle-hover:#d3e6de; --daisy-edge:#a9dcc6;
+  --late:#e2552f; --late-soft:#fde4dc;
+  --leaf-a:#34c99a; --leaf-b:#8fdb4e; --leaf-c:#137a5a;
+  --tile1:#ddf8ee; --tile2:#f1fbcb;
+  --pot1:#ffffff; --pot2:#c6ecd9; --pot3:#e6f5a8;
+  --bloom1:#ff8fab; --bloom2:#b8a5ff; --bloom3:#ffd84a;
+  --face:#15261f; --blush:#ff9fb4; --sweat:#5db8f0; --tongue:#ff6f93;
+  --display:"Outfit","Noto Sans KR",system-ui,sans-serif;
+  --body:"Noto Sans KR","Outfit",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1613; --surface:#15201c; --fg:#e6f2ec; --muted:#93a89f; --line:#24352e;
+  --lime:#d4f53c; --lime-soft:#2b3413; --on-lime:#10251d;
+  --mint:#6ee7c1; --mint-soft:#15302a; --mint-deep:#6ee7c1;
+  --idle:#223029; --idle-fg:#8fa79d; --idle-hover:#2a3d35; --daisy-edge:#4fae8c;
+  --late:#ff8a66; --late-soft:#3a2119;
+  --leaf-a:#3ed6a5; --leaf-b:#a6e85e; --leaf-c:#0b5a42;
+  --tile1:#173a30; --tile2:#2f3a14;
+  --pot1:#e8f0ec; --pot2:#8fd9bb; --pot3:#c9e36a;
+  --bloom1:#ff8fab; --bloom2:#b8a5ff; --bloom3:#ffd84a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1613; --surface:#15201c; --fg:#e6f2ec; --muted:#93a89f; --line:#24352e;
+  --lime:#d4f53c; --lime-soft:#2b3413; --on-lime:#10251d;
+  --mint:#6ee7c1; --mint-soft:#15302a; --mint-deep:#6ee7c1;
+  --idle:#223029; --idle-fg:#8fa79d; --idle-hover:#2a3d35; --daisy-edge:#4fae8c;
+  --late:#ff8a66; --late-soft:#3a2119;
+  --leaf-a:#3ed6a5; --leaf-b:#a6e85e; --leaf-c:#0b5a42;
+  --tile1:#173a30; --tile2:#2f3a14;
+  --pot1:#e8f0ec; --pot2:#8fd9bb; --pot3:#c9e36a;
+  --bloom1:#ff8fab; --bloom2:#b8a5ff; --bloom3:#ffd84a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:24px 72px;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;text-wrap:balance}
+.num{font-family:var(--display);font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer;color:inherit;background:none;border:none;padding:0}
+button:focus-visible,input:focus-visible{outline:2px solid var(--mint-deep);outline-offset:2px}
+input{font:inherit;color:var(--fg);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;min-width:0}
+input:focus{border-color:var(--mint)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:9px 16px;font-weight:600;font-size:14px;white-space:nowrap;border:1.5px solid var(--line);background:var(--surface)}
+.btn:hover{border-color:var(--mint)}
+.btn .dice{width:14px;height:14px;margin-right:5px;vertical-align:-2px}
+.btn.lime{background:var(--lime);border-color:var(--lime);color:var(--on-lime)}
+.btn.lime:hover{filter:brightness(.96)}
+.btn.wbtn{background:var(--idle);border-color:var(--idle);color:var(--idle-fg)}
+.btn.wbtn:hover{background:var(--idle-hover);border-color:var(--idle-hover);color:var(--mint-deep);filter:none}
+.btn.wbtn.on{background:var(--lime);border-color:var(--lime);color:var(--on-lime)}
+.btn.wbtn .undo{font-size:12px;font-weight:600;opacity:.6;margin-left:4px;padding-left:8px;border-left:1.5px solid currentColor}
+.btn.wbtn.on:hover{background:var(--late-soft);border-color:var(--late-soft);color:var(--late)}
+.btn.ghost{border-color:transparent;background:none;color:var(--muted);padding-inline:10px}
+.btn.ghost:hover{color:var(--fg)}
+.btn.danger{border-color:var(--late);color:var(--late)}
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--mint-soft);color:var(--mint-deep)}
+.pill.due{background:var(--lime);color:var(--on-lime)}
+.pill.late{background:var(--late-soft);color:var(--late)}
+.pill.none{background:var(--line);color:var(--muted)}
+.label{font-size:12px;color:var(--muted);letter-spacing:.02em}
+
+/* header */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .logo{width:32px;height:32px;flex:none;display:block}
+.brand h1{font-size:24px}
+.date{color:var(--muted);font-size:13px}
+
+/* today banner */
+.banner{background:linear-gradient(120deg,var(--lime) 0%,var(--mint) 100%);color:var(--on-lime);border-radius:22px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.banner h2{font-size:22px;word-break:keep-all}
+.banner p{margin:2px 0 0;font-size:14px;opacity:.85}
+.banner .chips{display:flex;gap:5px;flex-wrap:wrap}
+.banner .chips button{background:rgba(255,255,255,.55);color:var(--on-lime);border-radius:999px;padding:3px 9px;font-size:11.5px;font-weight:600;line-height:1.5}
+.banner .chips button.late{background:var(--on-lime);color:var(--lime)}
+/* weather banner: the whole banner takes the sky's colours; text flips to white on dark skies */
+.banner{position:relative;overflow:hidden;isolation:isolate;color:var(--bn-fg,var(--on-lime))}
+.banner > :not(.wx){position:relative;z-index:1}
+.banner.bn-dark{text-shadow:0 1px 10px rgba(0,0,0,.18)}
+.banner.bn-dark .chips button{background:rgba(255,255,255,.2);color:#fff;text-shadow:none}
+.banner.bn-dark .chips button.late{background:#fff;color:#b8401f}
+.banner.wxon:not(.bn-dark) .chips button{background:rgba(255,255,255,.62)}
+.banner.wxon:not(.bn-dark) .chips button.late{background:#10251d;color:#fff}
+.bn-cta{background:var(--on-lime)!important;color:var(--lime)!important;border-color:transparent!important}
+.banner.bn-dark .bn-cta{background:#fff!important;color:#10251d!important}
+@media (min-width:621px){.banner.wxon{min-height:136px}.banner.wxon .chips{align-self:flex-end}}
+.wxline{margin-top:6px;font-size:11.5px;font-weight:500;opacity:.6;letter-spacing:.01em}
+.wx{position:absolute;inset:0;z-index:0;pointer-events:none}
+.wx > *,.wx-fx > *{position:absolute;inset:0}
+/* the decoration fades toward the text side so it never fights the copy */
+.wx-fx{opacity:.75}
+.banner.bn-dark .wx-fx{opacity:.45}
+.banner.bn-dark .wx-fog{opacity:.45}
+.wx-art{width:100%;height:100%}
+.wx-art.narrow{display:none}
+@media (max-width:620px){.wx-art.wide{display:none}.wx-art.narrow{display:block}}
+/* fine print grain over the sky only */
+.wx-grain{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.35;mix-blend-mode:soft-light}
+.wx-fog{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='32'%3E%3Cpath d='M0 14 Q22.5 10.6 45.0 14 T90.0 14 T135.0 14 T180 14' fill='none' stroke='%23ffffff' stroke-opacity='0.6' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='44'%3E%3Cpath d='M0 32 Q30.0 27.2 60.0 32 T120.0 32 T180.0 32 T240 32' fill='none' stroke='%23ffffff' stroke-opacity='0.42' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");filter:blur(.4px);animation:wxFogA 18s linear infinite}
+@keyframes wxFogA{from{background-position:0 0,0 0}to{background-position:-180px 0,240px 0}}
+.wx-rain{inset:-280px 0 0;animation:wxRain 1.1s linear infinite}
+.wx-snow{inset:-260px 0 0;animation:wxSnow 9s linear infinite}
+/* tiles are generated at boot (varied lengths/sizes); these shifts equal one tile so the loop is seamless */
+@keyframes wxRain{from{background-position:0 0,0 0}to{background-position:-57.2px 260px,-44px 200px}}
+@keyframes wxSnow{from{background-position:0 0,0 0}to{background-position:24px 240px,-18px 180px}}
+@keyframes wxDrift{from{transform:translateX(-8px)}to{transform:translateX(8px)}}
+@keyframes wxFloat{0%{transform:translate(-12px,0)}50%{transform:translate(0,-1.5px)}100%{transform:translate(12px,0)}}
+@keyframes wxBob{from{transform:translateY(-2px)}to{transform:translateY(2px)}}
+.wx-orb{inset:auto!important;top:10px!important;right:22%!important;width:150px;height:104px}
+@media (max-width:620px){.wx-orb{display:none}}
+.wx .glow{transform-box:fill-box;transform-origin:center;animation:wxPulse 6s ease-in-out infinite alternate}
+.wx .glow.b{animation-duration:4.5s;animation-direction:alternate-reverse}
+.wx .bob{animation:wxBob 7s ease-in-out infinite alternate}
+.wx .cl{animation:wxFloat 22s ease-in-out infinite alternate}
+.wx .bolt{animation:wxBolt 7s linear infinite}
+@keyframes wxPulse{from{transform:scale(.93)}to{transform:scale(1.07)}}
+@keyframes wxBolt{0%,86%,95%,100%{opacity:.75}89%{opacity:1}90%{opacity:.2}91.5%{opacity:1}}
+.wx-flash{background:rgba(255,255,240,.35);opacity:0;animation:wxFlash 7s linear infinite}
+@keyframes wxFlash{0%,88%,93%,100%{opacity:0}89%{opacity:1}90%{opacity:.15}91.5%{opacity:.8}}
+@keyframes wxTwinkle{0%,100%{opacity:.2}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.wx *{animation:none!important}}
+
+/* home grid */
+.home{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:860px){.home{grid-template-columns:minmax(0,1fr)}}
+.sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.sec-head h2{font-size:18px}
+.plants{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+.pcard{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:12px;display:flex;flex-direction:column;gap:8px;text-align:left;transition:border-color .15s,transform .15s;position:relative}
+.pcard:hover{border-color:var(--mint);transform:translateY(-1px)}
+.pcard.late{border-color:var(--late)}
+.pcard{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pcard.dragging{z-index:5;transition:none;will-change:transform;box-shadow:0 18px 36px -12px rgba(16,37,29,.35);border-color:var(--mint);cursor:grabbing}
+.pcard.dragging .qw{pointer-events:none}
+body.dragging-any{cursor:grabbing}
+body.dragging-any .pcard{transition:none}
+body.dragging-any .pcard:hover{transform:none;border-color:var(--line)}
+body.dragging-any .pcard.late:hover{border-color:var(--late)}
+.pcard .av{border-radius:16px;aspect-ratio:1/1;max-width:100%;display:grid;place-items:center;overflow:hidden}
+.pcard .av svg{width:86%;height:86%}
+.pcard .nm{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.since{display:flex;align-items:baseline;gap:3px}
+.since b{font-family:var(--display);font-size:30px;font-weight:700;line-height:1;letter-spacing:-.03em}
+.since span{font-size:13px;color:var(--muted)}
+/* Korean "오늘" is much wider than a digit at the same size, so it gets a smaller face that keeps the row height */
+.since.today{min-height:30px;align-items:flex-end}
+.since.today b{font-family:inherit;font-size:20px;letter-spacing:-.02em;line-height:1.1}
+.hero .since.today{min-height:56px}
+.hero .since.today b{font-size:34px}
+.pcard .row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.qw{width:34px;height:34px;border-radius:50%;background:var(--idle);color:var(--idle-fg);display:grid;place-items:center;flex:none;transition:background .15s,color .15s}
+.qw:hover{background:var(--idle-hover);color:var(--mint-deep)}
+.qw.on{background:var(--lime);color:var(--on-lime)}
+.qw.on:hover{background:var(--late-soft);color:var(--late)}
+.qw svg{width:16px;height:16px}
+.addcard{border:1.5px dashed var(--mint);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:200px;color:var(--mint-deep);font-weight:600}
+.addcard .plus{width:40px;height:40px;border-radius:50%;background:var(--mint-soft);display:grid;place-items:center;font-size:22px}
+
+/* calendar */
+.cal{background:var(--surface);border:1.5px solid var(--line);border-radius:22px;padding:16px}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cal-head h3{font-size:18px}
+.nav{display:flex;gap:4px}
+.nav button{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.nav button:hover{background:var(--mint-soft);color:var(--fg)}
+.grid7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.wd{font-size:11px;color:var(--muted);text-align:center;padding-bottom:4px}
+.wd.sun{color:var(--late)}
+.cell{border-radius:12px;min-height:62px;padding:5px;display:flex;flex-direction:column;align-items:center;gap:3px;border:1.5px solid transparent;position:relative;min-width:0}
+.cell:hover{background:var(--mint-soft)}
+.cell .d{font-family:var(--display);font-size:13px;font-weight:500;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.cell.out{opacity:.35}
+.cell.today .d{background:var(--lime);color:var(--on-lime);font-weight:700}
+.cell.sel{border-color:var(--mint)}
+.cell.future{cursor:pointer}
+.minis{display:flex;flex-wrap:wrap;justify-content:center;gap:1px;max-width:100%}
+.mini{width:18px;height:18px;border-radius:50%;overflow:hidden;display:grid;place-items:center;flex:none}
+.mini svg{width:18px;height:18px}
+.more{font-size:10px;color:var(--muted);line-height:18px}
+.dues{display:flex;gap:2px;justify-content:center}
+.due-dot{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--mint-deep)}
+.due-dot.late{border-color:var(--late);background:var(--late)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.lg-w{width:12px;height:12px;border-radius:50%;background:var(--mint)}
+.lg-t{width:12px;height:12px;border-radius:50%;background:var(--lime)}
+.daypanel{margin-top:12px;border-top:1.5px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.daypanel h4{margin:0;font-size:14px}
+.togs{display:flex;flex-wrap:wrap;gap:6px}
+.tog{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:999px;padding:3px 12px 3px 4px;font-size:13px;font-weight:500}
+.tog .mini{width:24px;height:24px}.tog .mini svg{width:24px;height:24px}
+.tog.on{background:var(--mint-soft);border-color:var(--mint);color:var(--mint-deep);font-weight:700}
+.tog[disabled]{cursor:default}
+.hint{font-size:12.5px;color:var(--muted)}
+
+/* detail */
+.back{align-self:flex-start}
+.hero{background:var(--surface);border:1.5px solid var(--line);border-radius:26px;padding:20px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:620px){.hero{grid-template-columns:minmax(0,1fr)}.hero .big{max-width:220px;margin:0 auto}}
+.hero .big{border-radius:24px;aspect-ratio:1/1;width:100%;display:grid;place-items:center}
+.hero .big svg{width:88%;height:88%}
+.hero .info{display:flex;flex-direction:column;gap:12px;min-width:0}
+.hero h2{font-size:28px;overflow-wrap:anywhere}
+.hero .type{font-size:13px;color:var(--muted)}
+.hero .since b{font-size:56px}
+.hero .since span{font-size:16px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.detail{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:860px){.detail{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--surface);border:1.5px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.box h3{font-size:17px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--bg);border-radius:14px;padding:10px 12px}
+.stat b{display:block;font-family:var(--display);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.pcal .cell{min-height:44px;justify-content:center}
+.pcal .cell .d{width:32px;height:32px;font-size:14px}
+.pcal .cell.w .d{background:var(--pc,var(--mint));color:var(--on-lime);font-weight:700}
+.pcal .cell.nx .d{box-shadow:inset 0 0 0 2px var(--mint-deep)}
+.pcal .cell.nx.lt .d{box-shadow:inset 0 0 0 2px var(--late)}
+.pcal .cell.od{background:var(--late-soft)}
+.pcal .cell.today .d{background:var(--lime);color:var(--on-lime)}
+.pcal .cell.today.w .d{background:var(--pc,var(--mint));box-shadow:inset 0 0 0 2.5px var(--lime)}
+.lg-n{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--mint-deep)}
+.lg-o{width:12px;height:12px;border-radius:3px;background:var(--late-soft)}
+.hist{list-style:none;margin:0;padding:0}
+.hist li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.hist li:last-child{border-bottom:none}
+.gap{font-size:12px;color:var(--muted);margin-left:6px}
+.x{color:var(--muted);font-size:12.5px;padding:4px 8px;border-radius:8px}
+.x:hover{color:var(--late);background:var(--late-soft)}
+.pickrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pickrow input{width:auto;flex:1 1 160px}
+
+/* form + type picker */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgrid .full{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted);min-width:0}
+.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:6px}
+.types button{border:1.5px solid var(--line);border-radius:14px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;color:var(--muted);min-width:0}
+.types button svg{width:44px;height:44px}
+.types button[aria-checked="true"]{border-color:var(--mint);background:var(--mint-soft);color:var(--mint-deep);font-weight:700}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(8,20,16,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10;padding:16px}
+.scrim[hidden]{display:none}
+@media (min-width:620px){.scrim{align-items:center}}
+.sheet{background:var(--surface);border-radius:26px;width:100%;max-width:520px;max-height:calc(100% - 8px);overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center}
+.sheet-head h2{font-size:20px}
+.preview{display:flex;align-items:center;gap:14px}
+.preview .av{width:104px;height:104px;border-radius:22px;display:grid;place-items:center;flex:none}
+.preview .av svg{width:90%;height:90%}
+.notice{font-size:13px;color:var(--late);background:var(--late-soft);padding:10px 14px;border-radius:12px}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:28px 16px}
+.empty strong{display:block;color:var(--fg);font-size:16px;margin-bottom:4px}
+/* per-plant colors */
+.cdots{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;max-width:100%}
+.cdot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
+.cring{width:9px;height:9px;border-radius:50%;border:2px solid;flex:none;display:inline-block}
+.cring.late{box-shadow:0 0 0 1.5px var(--late)}
+.pfilter{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.pchip{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:500}
+.pchip i{width:10px;height:10px;border-radius:50%}
+.pchip[aria-pressed="true"]{border-color:var(--fg);font-weight:700}
+.pfilter.dim .pchip[aria-pressed="false"]{opacity:.45}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:30px;height:30px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1.5px var(--line)}
+.sw[aria-checked="true"]{box-shadow:0 0 0 2.5px var(--fg)}
+.cdot-name{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:1px}
+/* seasons */
+.months{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.months button{border:1.5px solid var(--line);border-radius:999px;padding:6px 0;font-family:var(--display);font-size:13px;font-weight:600;color:var(--muted)}
+.months button[aria-pressed="true"]{background:var(--mint-soft);border-color:var(--mint);color:var(--mint-deep)}
+.season{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted);border:1.5px solid var(--line);border-radius:999px;padding:5px 12px}
+.season:hover{border-color:var(--mint);color:var(--fg)}
+.season b{color:var(--mint-deep)}
+.cur{font-weight:700;color:var(--fg)}
+/* character motion */
+/* fill-box only on the animated groups: on other elements it would change how their transform attributes resolve */
+.pl .hd,.pl .eye,.pl .pp,.pl .br,.pl .mo,.pl .ck,.pl .zz,.pl .te,.pl .bu,.pl .cu{transform-box:fill-box}
+.pl .sw{transform-box:view-box;transform-origin:60px 96px}
+.pl .bd{transform-box:view-box;transform-origin:60px 137px}
+.pl .hd,.pl .eye,.pl .pp,.pl .br,.pl .mo,.pl .ck,.pl .zz,.pl .te,.pl .bu,.pl .cu{transform-origin:center}
+.pl:not(.still) .sw{animation:sway calc(3.8s*var(--sp)) ease-in-out var(--dl) infinite alternate}
+.pl:not(.still) .eye{animation:blink calc(5.5s*var(--sp)) linear var(--dl) infinite}
+.pl:not(.still) .hd{animation:turn calc(9s*var(--sp)) ease-in-out var(--dl) infinite}
+.pl:not(.still) .pp{animation:lookSync calc(9s*var(--sp)) ease-in-out var(--dl) infinite}
+.pl:not(.still) .br{animation:brow calc(4.5s*var(--sp)) ease-in-out var(--dl) infinite}
+@keyframes sway{from{transform:rotate(-2.5deg)}to{transform:rotate(2.5deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+/* head turns: front, left, front, right, a quick glance left, front — uneven holds so it feels unplanned */
+@keyframes turn{0%,16%{transform:translateX(0) skewY(0)}23%,38%{transform:translateX(-2.6px) skewY(-2deg)}45%,50%{transform:translateX(0) skewY(0)}57%,72%{transform:translateX(2.6px) skewY(2deg)}79%,84%{transform:translateX(0) skewY(0)}88%,93%{transform:translateX(-1.6px) skewY(-1deg)}100%{transform:translateX(0) skewY(0)}}
+@keyframes lookSync{0%,16%{transform:translateX(0)}23%,38%{transform:translateX(-1.5px)}45%,50%{transform:translateX(0)}57%,72%{transform:translateX(1.5px)}79%,84%{transform:translateX(0)}88%,93%{transform:translateX(-1px)}100%{transform:translateX(0)}}
+@keyframes brow{0%,68%,100%{transform:translateY(0)}76%{transform:translateY(-2.4px)}84%{transform:translateY(0)}90%{transform:translateY(-1.4px)}}
+/* just watered: hops and wiggles */
+.pl.m-happy .bd{animation:hop calc(1.7s*var(--sp)) ease-in-out var(--dl) infinite}
+.pl.m-happy .sw{animation:swayBig calc(1.7s*var(--sp)) ease-in-out var(--dl) infinite alternate}
+.pl.m-happy .br{animation:browBounce calc(.85s*var(--sp)) ease-in-out var(--dl) infinite}
+.pl.m-happy .ck{animation:pulse calc(1.7s*var(--sp)) ease-in-out var(--dl) infinite}
+.pl.m-happy .hd{animation:turn calc(6s*var(--sp)) ease-in-out var(--dl) infinite}
+@keyframes hop{0%,100%{transform:translateY(0) scale(1,1)}18%{transform:translateY(0) scale(1.05,.94)}40%{transform:translateY(-6px) scale(.97,1.04)}60%{transform:translateY(0) scale(1.03,.97)}75%{transform:translateY(0) scale(1,1)}}
+@keyframes swayBig{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+@keyframes browBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.12);opacity:.95}}
+/* watering day: pants, eyes dart around looking for water */
+.pl.m-due .bd{animation:pant calc(.9s*var(--sp)) ease-in-out var(--dl) infinite}
+.pl.m-due .mo{animation:mouthPant calc(.45s*var(--sp)) ease-in-out var(--dl) infinite alternate}
+.pl.m-due .hd{animation:turn calc(4.5s*var(--sp)) ease-in-out var(--dl) infinite}
+.pl.m-due .pp{animation:lookSync calc(4.5s*var(--sp)) ease-in-out var(--dl) infinite}
+.pl.m-due .cu{animation:rise calc(1.6s*var(--sp)) ease-out var(--dl) infinite}
+@keyframes pant{0%,100%{transform:scale(1,1)}50%{transform:scale(1.015,.985)}}
+@keyframes mouthPant{from{transform:scale(1,1)}to{transform:scale(1.2,.6)}}
+@keyframes rise{0%{transform:translateY(3px);opacity:0}30%{opacity:1}100%{transform:translateY(-6px);opacity:0}}
+/* overdue: trembles, wilts, bursts flicker, tears fall */
+.pl.m-late .bd{animation:shake calc(.22s*var(--sp)) linear var(--dl) infinite}
+.pl.m-late .sw{animation:droop calc(2.6s*var(--sp)) ease-in-out var(--dl) infinite alternate}
+.pl.m-late .br{animation:quiver calc(.5s*var(--sp)) ease-in-out var(--dl) infinite alternate}
+.pl.m-late .bu{animation:flicker calc(.7s*var(--sp)) steps(2,end) var(--dl) infinite}
+.pl.m-late .te{animation:tear calc(1.8s*var(--sp)) ease-in var(--dl) infinite}
+.pl.m-late .hd{animation:none}
+.pl.m-late .pp{animation:dizzy calc(1.6s*var(--sp)) linear var(--dl) infinite}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-.7px)}75%{transform:translateX(.7px)}}
+@keyframes droop{from{transform:rotate(-3deg) translateY(1px)}to{transform:rotate(1deg)}}
+@keyframes quiver{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-1px) rotate(3deg)}}
+@keyframes flicker{0%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.9)}}
+@keyframes tear{0%{transform:translateY(-2px);opacity:0}15%{opacity:1}100%{transform:translateY(12px);opacity:0}}
+@keyframes dizzy{0%{transform:translate(1.5px,0)}25%{transform:translate(0,1.5px)}50%{transform:translate(-1.5px,0)}75%{transform:translate(0,-1.5px)}100%{transform:translate(1.5px,0)}}
+/* no records: dozes, slow breathing, z's drift up */
+.pl.m-none .bd{animation:breathe calc(4s*var(--sp)) ease-in-out var(--dl) infinite}
+.pl.m-none .sw{animation:sway calc(6s*var(--sp)) ease-in-out var(--dl) infinite alternate}
+.pl.m-none .eye,.pl.m-none .pp,.pl.m-none .hd{animation:none}
+.pl.m-none .zz{animation:zzz calc(3.2s*var(--sp)) ease-in-out var(--dl) infinite}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,.975)}}
+@keyframes zzz{0%{transform:translate(-3px,5px) scale(.7);opacity:0}30%{opacity:1}100%{transform:translate(3px,-6px) scale(1.1);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pl *{animation:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>
+/* web-app shell */
+html,body{margin:0}
+*{box-sizing:border-box}
+.wrap{padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+.backup{display:flex;justify-content:center;gap:14px;font-size:12px;color:var(--muted);padding-top:8px}
+.backup button{background:none;border:0;padding:4px 2px;color:inherit;font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
+.backup button:hover{color:var(--fg)}
+</style>
+
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><svg class="logo" viewBox="-1.5 -1.5 33 33" aria-hidden="true"><g fill="var(--daisy-edge)" stroke="var(--daisy-edge)" stroke-width="2.07" stroke-linejoin="round"><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(0 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(30 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(60 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(90 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(120 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(150 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(180 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(210 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(240 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(270 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(300 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(330 15 15)"/></g><g fill="#ffffff" stroke="var(--daisy-edge)" stroke-width=".9"><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(0 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(30 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(60 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(90 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(120 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(150 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(180 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(210 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(240 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(270 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(300 15 15)"/><ellipse cx="15" cy="7.2" rx="2.6" ry="6.2" transform="rotate(330 15 15)"/></g><circle cx="15" cy="15" r="4.6" fill="#ffd23f"/><circle cx="15" cy="15" r="4.6" fill="none" stroke="#f0b400" stroke-width=".8"/></svg><h1>비온뒤 맑음</h1></div>
+    <div class="date num" id="today"></div>
+  </div>
+  <div class="notice" id="notice" hidden></div>
+  <main id="app"><div class="empty"><strong>화분 세는 중…</strong>잠깐만 기다려.</div></main>
+  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden></footer>
+</div>
+
+<div class="scrim" id="scrim" hidden>
+  <form class="sheet" id="addForm" autocomplete="off" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+    <div class="sheet-head"><h2 id="addTitle">식물 추가</h2><button type="button" class="btn ghost" id="addClose">닫기</button></div>
+    <div class="preview">
+      <div class="av" id="addPrev"></div>
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+        <div class="hint">이름 넣으면 모양은 내가 골라줄게. 맘에 안 들면 아래서 바꿔.</div>
+        <button type="button" class="btn" id="addShuffle" style="align-self:flex-start"><svg class="dice" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5.3" cy="5.3" r="1.25" fill="currentColor"/><circle cx="8" cy="8" r="1.25" fill="currentColor"/><circle cx="10.7" cy="10.7" r="1.25" fill="currentColor"/></svg>다시 뽑기</button>
+      </div>
+    </div>
+    <div class="fgrid">
+      <label class="f full">식물 이름<input id="addName" required maxlength="30" placeholder="예: 몬스테라"></label>
+      <div class="full"><div class="label" style="margin-bottom:6px">형태</div><div class="types" id="addTypes" role="radiogroup" aria-label="식물 형태"></div></div>
+      <div class="full"><div class="label" style="margin-bottom:6px">달력 색</div><div class="swatches" id="addColors" role="radiogroup" aria-label="달력 색"></div></div>
+      <label class="f">하절기 물 주기 (일)<input id="addInterval" type="number" min="1" max="365" required value="7"></label>
+      <label class="f">동절기 물 주기 (일)<input id="addWinter" type="number" min="1" max="365" required value="14"></label>
+      <label class="f full">마지막으로 준 날<input id="addLast" type="date"></label>
+      <div class="hint full">동절기는 하절기의 2배로 알아서 채워둘게. 다르면 직접 고쳐.</div>
+    </div>
+    <button class="btn lime" type="submit" style="padding-block:12px">추가하기</button>
+  </form>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const MAX_HIST = 365;
+  let db = null, plants = [], loaded = false, pendingRender = false;
+  const view = { page:'home', id:null, month:null, sel:null, mode:null, confirmDel:false };
+  const chains = {};
+
+  // ---------- dates ----------
+  const pad = n => String(n).padStart(2,'0');
+  const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+  const dn = s => { const [y,m,d] = s.split('-').map(Number); return Date.UTC(y,m-1,d)/864e5; };
+  const fromDn = n => { const t = new Date(n*864e5); return `${t.getUTCFullYear()}-${pad(t.getUTCMonth()+1)}-${pad(t.getUTCDate())}`; };
+  const addDays = (s,n) => fromDn(dn(s)+n);
+  const WD = ['일','월','화','수','목','금','토'];
+  const md = s => { const t = new Date(dn(s)*864e5); return `${t.getUTCMonth()+1}월 ${t.getUTCDate()}일`; };
+  const mdw = s => { const t = new Date(dn(s)*864e5); return `${md(s)} (${WD[t.getUTCDay()]})`; };
+  const validDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s||'');
+  const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // ---------- plant vector profiles ----------
+  const TYPES = [
+    ['monstera','몬스테라'],['ficus','고무나무'],['bigleaf','큰 잎'],['snake','스투키'],
+    ['trailing','덩굴'],['cane','행운목'],['coin','동전잎'],['rosette','무늬 잎'],
+    ['twig','잔가지'],['bush','허브 덤불'],['cactus','선인장'],['succulent','다육이'],
+    ['cycad','소철'],['asparagus','아스파라거스'],['palm','야자·고사리'],['flower','꽃']
+  ];
+  const TYPE_LABEL = Object.fromEntries(TYPES);
+  // specific names first; the first match wins
+  const GUESS = [
+    ['cycad',/소철|사고야자|cycas|cycad/i],
+    ['asparagus',/아스파라거스|플루모수스|세타세우스|asparagus/i],
+    ['bigleaf',/떡갈|알로카시아|콜로카시아|극락조|여인초|바나나|스트렐리치아|alocasia|fiddle/i],
+    ['rosette',/칼라테아|칼라데아|마란타|스파티|아글라오네마|디펜바키아|calathea|maranta|spathiphyllum/i],
+    ['coin',/필레아|페페로미아|동전|수박페페|pilea|peperomia/i],
+    ['cane',/행운목|드라세나|드라코|유카|개운죽|마지나타|코르딜리네|천년초|dracaena|yucca/i],
+    ['twig',/올리브|유칼립|로즈마리|율마|애니시다|은엽|측백|olive|eucalyptus|rosemary/i],
+    ['bush',/바질|허브|민트|애플민트|피토니아|타임|오레가노|basil|mint|herb|fittonia/i],
+    ['monstera',/몬스테라|monstera|안스리움 ?잎/i],
+    ['cactus',/선인장|cactus|백년초|용신목/i],
+    ['succulent',/다육|에케베리아|염좌|카랑코에|하월시아|succulent|세덤|리톱스/i],
+    ['snake',/스투키|산세베리아|산세|sansevieria|snake|알로에/i],
+    ['trailing',/스킨답서스|포토스|아이비|필로덴드론|트리안|호야|덩굴|행잉|pothos|ivy|립살리스|디시디아/i],
+    ['palm',/야자|아레카|고사리|보스턴|palm|fern|파키라|녹보수|해피트리/i],
+    ['flower',/꽃|장미|난초|호접란|안스리움|제라늄|베고니아|수국|flower|라벤더/i],
+    ['ficus',/고무나무|벵갈|뱅갈|ficus/i],
+  ];
+  const guessType = name => { for(const [t,re] of GUESS) if(re.test(name||'')) return t; return 'ficus'; };
+  const hashStr = s => { let h = 2166136261; for(const c of String(s)) { h ^= c.codePointAt(0); h = Math.imul(h,16777619); } return h>>>0; };
+  const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed>>>15, 1|seed); t = t + Math.imul(t ^ t>>>7, 61|t) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; };
+  const f1 = n => Math.round(n*10)/10;
+  const bz = (a,b,c,d,t) => { const u=1-t; return u*u*u*a + 3*u*u*t*b + 3*u*t*t*c + t*t*t*d; };
+  const COLORS = [['mint','#3ecf9e','민트'],['lime','#a8d61f','라임'],['sky','#4cb4ee','하늘'],['lavender','#9b87f5','라벤더'],['pink','#ff7fa0','핑크'],['sun','#ffc233','노랑'],['orange','#ff8f4d','주황'],['teal','#159f9f','청록']];
+  const COLOR = Object.fromEntries(COLORS.map(c=>[c[0],c[1]]));
+  const colorOf = p => COLOR[p.color] || COLORS[0][1];
+  const tileFor = hex => `color-mix(in srgb, ${hex} 18%, var(--surface))`;
+  const freeColor = () => { const used = new Set(plants.map(p=>p.color)); return (COLORS.find(c=>!used.has(c[0]))||COLORS[plants.length%COLORS.length])[0]; };
+
+  // Flat geometric faces on the pot: every plant gets its own eyes / nose / pot shape (from its seed),
+  // the mood only changes brows, pupils, mouth and the little accents around it.
+  const NAVY = '#1d2340';
+  const ACC = ['#ffd23f','#ff6fa8','#2f5bea','#ff5a36','#1fb5a8','#8f63ff'];
+  const BAN = {mint:[4], lime:[0], sky:[2], lavender:[5], pink:[1,3], sun:[0,3], orange:[3,0], teal:[4]};
+  let clipN = 0;
+  function persona(seed, colorKey){
+    const R = rng(seed ^ 0x9e3779b9), ok = ACC.map((_,i)=>i).filter(i=>!(BAN[colorKey]||[]).includes(i));
+    const pick = () => ACC[ok[Math.floor(R()*ok.length)]];
+    const nose = pick(); let brow = pick(); if(brow===nose) brow = ACC[ok[(ok.indexOf(ACC.indexOf(nose))+1)%ok.length]];
+    return { eye: Math.floor(R()*4), nose: Math.floor(R()*4), noseC: nose, browC: brow, pot: Math.floor(R()*3), pattern: Math.floor(R()*4), mouthC: R()>.5 ? NAVY : pick() };
+  }
+  function potShape(k){
+    return [
+      'M31 97 H89 L84 133 Q83.4 137 79 137 H41 Q36.6 137 36 133Z',           // tapered
+      'M29 97 H91 V108 Q91 137 60 137 Q29 137 29 108Z',                       // bowl
+      'M32 97 H88 V131 Q88 137 82 137 H38 Q32 137 32 131Z'                    // cylinder
+    ][k];
+  }
+  function potPattern(k, R){
+    let o = '';
+    if(k===1){ for(let i=0;i<14;i++){ const x=30+R()*60, y=100+R()*36, a=R()*180; o += `<rect x="${f1(x)}" y="${f1(y)}" width="6" height="1.8" rx=".9" fill="#fff" opacity=".45" transform="rotate(${f1(a)} ${f1(x+3)} ${f1(y+.9)})"/>`; } }
+    else if(k===2){ for(let i=0;i<12;i++){ o += `<circle cx="${f1(30+R()*60)}" cy="${f1(100+R()*36)}" r="${f1(1.4+R()*1.8)}" fill="#fff" opacity=".4"/>`; } }
+    else if(k===3){ o = `<rect x="20" y="131" width="80" height="3.2" fill="#fff" opacity=".45"/><rect x="20" y="126" width="80" height="1.6" fill="#fff" opacity=".35"/>`; }
+    return o;
+  }
+  function faceSVG(mood, P){
+    const lx = 49, rx = 71, ey = 110;
+    const look = {happy:[0,-1], ok:[0,0], due:[0,-2.2], late:[0,1], none:[0,1.2]}[mood] || [0,0];
+    const st = (c,w=2.6) => `stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+    let eyes = '';
+    const eye = (cx) => {
+      const [px,py] = look;
+      switch(P.eye){
+        case 0: return `<g class="eye"><circle cx="${cx}" cy="${ey}" r="6" fill="#fff"/><g class="pp"><circle cx="${f1(cx+px*1.2)}" cy="${f1(ey+py*1.2)}" r="3.1" fill="${NAVY}"/></g></g>`;
+        case 1: return `<g class="eye"><path d="M${cx-7} ${ey} Q${cx} ${ey-6.5} ${cx+7} ${ey} Q${cx} ${ey+6.5} ${cx-7} ${ey}Z" fill="#fff"/><g class="pp"><circle cx="${f1(cx+px)}" cy="${f1(ey+py*.6)}" r="3" fill="${NAVY}"/></g></g>`;
+        case 2: return `<g class="eye"><circle cx="${cx}" cy="${ey}" r="4" fill="#fff"/><g class="pp"><circle cx="${f1(cx+px*.8)}" cy="${f1(ey+py*.8)}" r="1.9" fill="${NAVY}"/></g></g>`;
+        default: return `<g class="eye"><ellipse cx="${cx}" cy="${ey}" rx="5.2" ry="6.8" fill="#fff"/><g class="pp"><ellipse cx="${f1(cx+px)}" cy="${f1(ey+py*1.3)}" rx="2.6" ry="4" fill="${NAVY}"/></g></g>`;
+      }
+    };
+    if(mood==='none'){ // bored: heavy lids
+      eyes = eye(lx) + eye(rx) + `<rect x="${lx-7.5}" y="${ey-8}" width="15" height="8" fill="var(--potc)"/><rect x="${rx-7.5}" y="${ey-8}" width="15" height="8" fill="var(--potc)"/><path d="M${lx-6.5} ${ey} H${lx+6.5} M${rx-6.5} ${ey} H${rx+6.5}" ${st(P.browC,2.8)}/>`;
+    } else eyes = eye(lx) + eye(rx);
+    const brows = {
+      happy: `<path d="M${lx-5} 101.5 Q${lx} 98 ${lx+5} 101.5 M${rx-5} 101.5 Q${rx} 98 ${rx+5} 101.5" ${st(P.browC,2.6)}/>`,
+      ok:    `<path d="M${lx-5} 101 H${lx+4} M${rx-4} 101 H${rx+5}" ${st(P.browC,2.8)}/>`,
+      due:   `<path d="M${lx-5} 100 Q${lx} 96.5 ${lx+5} 100 M${rx-5} 100 Q${rx} 96.5 ${rx+5} 100" ${st(P.browC,2.6)}/>`,
+      late:  `<path d="M${lx-6} 103 L${lx+4} 99.5 M${rx+6} 103 L${rx-4} 99.5" ${st(P.browC,2.8)}/>`,
+      none:  ''
+    }[mood] || '';
+    const nose = [
+      `<rect x="57" y="104" width="6" height="15" rx="3" fill="${P.noseC}"/>`,
+      `<path d="M60 105 L66 119.5 H54Z" fill="${P.noseC}" stroke="${P.noseC}" stroke-width="1.5" stroke-linejoin="round"/>`,
+      `<circle cx="60" cy="117" r="3.6" fill="${P.noseC}"/>`,
+      `<rect x="57.5" y="100" width="5" height="19" rx="2.5" fill="${P.noseC}"/>`
+    ][P.nose];
+    const M = P.mouthC;
+    const mouth = {
+      happy: `<path d="M50 124 Q60 134.5 70 124" ${st(M,3)}/>`,
+      ok:    `<path d="M54 126 Q60 129.5 66 126" ${st(M,2.8)}/>`,
+      due:   `<ellipse cx="60" cy="127.5" rx="3.6" ry="4.2" fill="${M}"/>`,
+      late:  `<path d="M49 128 l3.7 -3 l3.7 3 l3.7 -3 l3.7 3 l3.7 -3 l3.7 3" ${st(M,2.6)}/>`,
+      none:  `<rect x="53" y="125.5" width="14" height="3.6" rx="1.8" fill="${M}"/>`
+    }[mood] || '';
+    let extra = '';
+    if(mood==='happy') extra = `<g class="ck"><ellipse cx="43" cy="119.5" rx="3.8" ry="2.6" fill="#ff6fa8" opacity=".8"/></g><g class="ck"><ellipse cx="77" cy="119.5" rx="3.8" ry="2.6" fill="#ff6fa8" opacity=".8"/></g>`;
+    if(mood==='due') extra = `<g class="cu"><path d="M84 78 q5 -7 0 -12 M91 83 q5 -7 0 -12" ${st('#2f5bea',2.4)}/></g>`;
+    if(mood==='late') extra = `<g class="bu"><path d="M22 84 L27 90 M18 94 L25 96 M28 78 L30 85 M98 84 L93 90 M102 94 L95 96 M92 78 L90 85" ${st('#ffd23f',3)}/></g><g class="te"><path d="M${rx+3} 116 q-3 4.5 0 7 q3 -2.5 0 -7Z" fill="#4cb4ee"/></g>`;
+    if(mood==='none') extra = `<g class="zz"><path d="M86 74 h6 l-6 7 h6 M95 64 h4.5 l-4.5 5 h4.5" ${st(NAVY,1.8)}/></g>`;
+    return `<g class="hd">${extra}<g class="br">${brows}</g>${eyes}${nose}<g class="mo">${mouth}</g></g>`;
+  }
+
+  // Per-plant look beyond the silhouette: leaf tone, leaf markings and overall size, all fixed by the seed.
+  // [a, b, c] = main leaf, lighter leaf, dark vein/stem. null = the theme's own greens.
+  const TONES = [
+    null,
+    ['#8fd14f','#c6e96c','#56891c'],   // 연두
+    ['#27ae9d','#71d5c1','#0e6b62'],   // 청록
+    ['#1f9466','#4dba70','#0c4b35'],   // 진초록
+    ['#b7a3d9','#d8ccef','#7e68a8'],   // 연보라
+    ['#86a597','#b1c9bb','#4d6a5c'],   // 은회색
+  ];
+  const TONE_OK = {  // which tones look believable per form
+    monstera:[0,1,3], ficus:[0,3,2], bigleaf:[0,3,2,1], snake:[0,3,1,2], trailing:[0,1,3,2], cane:[0,1,3],
+    coin:[0,1,2,3,4], rosette:[0,3,4,2], twig:[5,0,2,5], bush:[0,1,3,4], cactus:[0,2,5], succulent:[0,2,4,5],
+    palm:[0,1,3], flower:[0,3], cycad:[0,3,2,5], asparagus:[0,1,3],
+  };
+  // leaf markings: 0 none, 1 white splashes, 2 dots, 3 bands
+  const PAT_OK = { monstera:[1], ficus:[1,2], bigleaf:[1], snake:[3,3,1], trailing:[1,1,2], cane:[3,1],
+    coin:[2,3], rosette:[3,1,2], bush:[2,3] };
+  function variant(seed, type){
+    const R = rng((seed ^ 0x51ed270b) >>> 0), tones = TONE_OK[type] || [0];
+    const tone = R() < .4 ? 0 : tones[Math.floor(R()*tones.length)];
+    const pats = PAT_OK[type] || [], pat = pats.length && (type==='rosette' || R() < .5) ? pats[Math.floor(R()*pats.length)] : 0;
+    const tall = ['monstera','bigleaf','palm','ficus','twig','flower','cycad','asparagus'].includes(type); // these already reach the top of the frame
+    const sz = (tall ? [.86, .93, 1] : [.9, 1, 1.07])[Math.floor(R()*3)];
+    return {tone, pat, sz};
+  }
+  // how different two plants of the same form look (pot shape, pot pattern, tone, markings, size)
+  function lookKey(seed, type, colorKey){ const P = persona(seed, colorKey), V = variant(seed, type); return [P.pot, P.pattern, V.tone, V.pat, V.sz]; }
+  // pick a seed that looks as different as possible from the other plants of the same form
+  function distinctSeed(type, colorKey, excludeId){
+    const others = plants.filter(p => p.type===type && p.id!==excludeId).map(p => lookKey(p.seed, type, p.color));
+    let best = (Math.random()*2**31)>>>0, bestScore = -1;
+    if(!others.length) return best;
+    for(let i=0;i<40;i++){
+      const s = (Math.random()*2**31)>>>0, k = lookKey(s, type, colorKey);
+      const score = Math.min(...others.map(o => (o[0]!==k[0])*2 + (o[1]!==k[1]) + (o[2]!==k[2])*2 + (o[3]!==k[3])*1.5 + (o[4]!==k[4])));
+      if(score > bestScore){ best = s; bestScore = score; }
+    }
+    return best;
+  }
+
+  function plantSVG(type, seed, o={}){
+    const R = rng(seed), tile = 'var(--tile)';
+    const V = variant(seed, type), T = TONES[V.tone];
+    const L1 = T ? T[0] : 'var(--leaf-a)', L2 = T ? T[1] : 'var(--leaf-b)', L3 = T ? T[2] : 'var(--leaf-c)';
+    const potHex = o.color || '#3ecf9e', colorKey = (COLORS.find(c=>c[1]===potHex)||COLORS[0])[0];
+    const P = persona(seed, colorKey), pot = 'var(--potc)';
+    let g = '', gb = '', defs = '';  // gb = things behind the pot (e.g. a moss pole)
+    // leaf markings are a pattern laid over each leaf body (same path, same transform)
+    const pid = V.pat ? 'lp' + (++clipN) : '';
+    if(V.pat===1) defs = `<pattern id="${pid}" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(24)"><ellipse cx="5" cy="6" rx="4.2" ry="2.1" fill="#fff" opacity=".55"/><ellipse cx="15" cy="15" rx="3" ry="1.5" fill="#fff" opacity=".5"/><circle cx="17" cy="4" r="1.3" fill="#fff" opacity=".5"/></pattern>`;
+    if(V.pat===2) defs = `<pattern id="${pid}" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.15" fill="#fff" opacity=".6"/><circle cx="6" cy="6" r=".9" fill="#fff" opacity=".5"/></pattern>`;
+    if(V.pat===3) defs = `<pattern id="${pid}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-8)"><rect y="0" width="7" height="2.3" fill="${L3}" opacity=".32"/></pattern>`;
+    const ov = (d, tf='') => pid ? `<path d="${d}"${tf ? ` transform="${tf}"` : ''} fill="url(#${pid})"/>` : '';
+    const leafTear = 'M0 0 C-9 -4 -10 -22 0 -28 C10 -22 9 -4 0 0Z';
+    if(type==='monstera'){
+      const n = 3 + Math.floor(R()*3), items=[];
+      for(let i=0;i<n;i++){
+        const a = -52 + i*(104/(n-1)) + (R()*14-7), len = 38 + R()*20, rad = a*Math.PI/180;
+        items.push({a, len, x:60+Math.sin(rad)*len, y:98-Math.cos(rad)*len, s:.72+R()*.3, c:i%2?L2:L1});
+      }
+      items.sort((p,q)=>Math.abs(q.a)-Math.abs(p.a));
+      const body = 'M0 4 C-26 0 -30 -36 0 -44 C30 -36 26 0 0 4Z';
+      for(const it of items){
+        g += `<path d="M60 98 Q${f1(60+(it.x-60)*.25)} ${f1(98-it.len*.55)} ${f1(it.x)} ${f1(it.y)}" stroke="${L3}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+        let slits = '';
+        for(let k=1;k<=3;k++){ const y = -8-k*9; slits += `<path d="M${-24+k*2} ${y-3} L-6 ${y+2} M${24-k*2} ${y-3} L6 ${y+2}" stroke="${tile}" stroke-width="2.6" stroke-linecap="round"/>`; }
+        g += `<g transform="translate(${f1(it.x)} ${f1(it.y)}) rotate(${f1(it.a)}) scale(${f1(it.s)})"><path d="${body}" fill="${it.c}"/>${ov(body)}<path d="M0 2 V-40" stroke="${L3}" stroke-width="1.4" opacity=".6"/>${slits}</g>`;
+      }
+    } else if(type==='cactus'){
+      const h = 46 + R()*16, top = 98-h;
+      if(R()>.2){ const y0 = top+h*(.45+R()*.15); g += `<path d="M60 ${f1(y0)} H43 V${f1(y0-12-R()*10)}" stroke="${L2}" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`; }
+      if(R()>.35){ const y1 = top+h*(.25+R()*.2); g += `<path d="M60 ${f1(y1)} H77 V${f1(y1-10-R()*10)}" stroke="${L2}" stroke-width="11" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`; }
+      g += `<path d="M60 98 V${f1(top+10)}" stroke="${L1}" stroke-width="24" stroke-linecap="round"/>`;
+      g += `<path d="M60 97 V${f1(top+4)} M53 96 V${f1(top+10)} M67 96 V${f1(top+10)}" stroke="${L3}" stroke-width="1.2" opacity=".45" stroke-linecap="round"/>`;
+      for(let i=0;i<7;i++){ g += `<circle cx="${f1(52+R()*16)}" cy="${f1(top+6+R()*(h-14))}" r=".9" fill="${L3}" opacity=".6"/>`; }
+      if(R()>.45){ const c = ['var(--bloom1)','var(--bloom3)'][Math.floor(R()*2)]; g += `<g transform="translate(60 ${f1(top-3)})">${[0,72,144,216,288].map(r=>`<ellipse rx="3" ry="5" cy="-4" transform="rotate(${r})" fill="${c}"/>`).join('')}<circle r="2.4" fill="var(--lime)"/></g>`; }
+    } else if(type==='succulent'){
+      const leaf = 'M0 0 C-8 -6 -7 -20 0 -27 C7 -20 8 -6 0 0Z';
+      const layer = (n, spread, s, c) => { let o=''; for(let i=0;i<n;i++){ const a = -spread + i*(2*spread/(n-1)) + (R()*6-3); o += `<path d="${leaf}" transform="translate(60 91) rotate(${f1(a)}) scale(${f1(s)})" fill="${c}"/>`; } return o; };
+      g += layer(7, 86, 1.12, L2) + layer(5, 60, .9, L1) + layer(3, 30, .62, L2);
+      g += `<path d="${leaf}" transform="translate(60 91) scale(.42)" fill="${L1}"/>`;
+    } else if(type==='snake'){
+      const n = 4 + Math.floor(R()*3), blades=[];
+      for(let i=0;i<n;i++){ blades.push({x:44+i*(32/(n-1))+(R()*4-2), h:44+R()*32, w:9+R()*4, lean:(R()*8-4), c:i%2?L2:L1}); }
+      blades.sort((a,b)=>b.h-a.h);
+      for(const b of blades){
+        const {x,h,w,lean} = b, y0 = 99;
+        const d = `M${f1(x-w/2)} ${y0} C${f1(x-w/2-1)} ${f1(y0-h*.5)} ${f1(x-w*.3+lean)} ${f1(y0-h*.9)} ${f1(x+lean)} ${f1(y0-h)} C${f1(x+w*.3+lean)} ${f1(y0-h*.9)} ${f1(x+w/2+1)} ${f1(y0-h*.5)} ${f1(x+w/2)} ${y0}Z`;
+        g += `<path d="${d}" fill="${b.c}"/>${ov(d)}<path d="${d}" fill="none" stroke="var(--lime)" stroke-width="1.3"/>`;
+        if(!pid) for(let k=1;k<4;k++){ const yy = y0-h*k*.22; g += `<path d="M${f1(x-w*.32+lean*k*.2)} ${f1(yy)} q${f1(w*.32)} -3 ${f1(w*.64)} 0" stroke="${L3}" stroke-width="1.1" fill="none" opacity=".35"/>`; }
+      }
+    } else if(type==='ficus'){
+      const topX = 60 + R()*10-5, topY = 24 + R()*8;
+      const sx=[60,55,66,topX], sy=[98,72,52,topY];
+      g += `<path d="M60 98 C55 72 66 52 ${f1(topX)} ${f1(topY)}" stroke="${L3}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      const n = 5 + Math.floor(R()*3);
+      for(let i=0;i<n;i++){
+        const t = .22 + i*(.72/(n-1)), x = bz(...sx,t), y = bz(...sy,t), side = i%2?1:-1, a = side*(48+R()*22), s = .8+R()*.3;
+        g += `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(a)}) scale(${f1(s)})"><path d="${leafTear}" fill="${i%3?L1:L2}"/>${ov(leafTear)}<path d="M0 -1 V-24" stroke="${L3}" stroke-width="1" opacity=".5"/></g>`;
+      }
+      g += `<g transform="translate(${f1(topX)} ${f1(topY+2)}) scale(.75)"><path d="${leafTear}" fill="${L2}"/>${ov(leafTear)}</g>`;
+    } else if(type==='trailing'){
+      // three growth habits: long cascade, bushy mound, or climbing a moss pole
+      const heart = 'M0 0 C-6 -2 -8 -10 -3 -11 C-1 -11 0 -9 0 -8 C0 -9 1 -11 3 -11 C8 -10 6 -2 0 0Z';
+      const hp = (tf, c) => `<path d="${heart}" transform="${tf}" fill="${c}"/>${ov(heart, tf)}`;
+      const habit = Math.floor(R()*3);
+      // a vine hanging over one side of the pot; dir -1 = left, 1 = right
+      const hang = (dir, endY, reach) => {
+        const sx = dir < 0 ? 28 + R()*5 : 92 - R()*5;
+        const v = [sx,94, sx+dir*(10+R()*4),100, sx+dir*(reach+R()*4),(94+endY)/2, sx+dir*(reach*.5+R()*6),endY];
+        let o = `<path d="M${f1(v[0])} ${f1(v[1])} C${f1(v[2])} ${f1(v[3])} ${f1(v[4])} ${f1(v[5])} ${f1(v[6])} ${f1(v[7])}" stroke="${L3}" stroke-width="1.6" fill="none"/>`;
+        const step = endY > 124 ? .15 : .2;
+        for(let t=step;t<=1.01;t+=step){ const x = bz(v[0],v[2],v[4],v[6],t), y = bz(v[1],v[3],v[5],v[7],t); o += hp(`translate(${f1(x)} ${f1(y)}) rotate(${f1(150+R()*60)}) scale(${f1(.85+R()*.35)})`, t>.5?L2:L1); }
+        return o;
+      };
+      // a dome of leaves sitting on the soil
+      const mound = (n, rx, ry, s0) => {
+        const it = [];
+        for(let i=0;i<n;i++){ const th = Math.PI*(.1 + R()*.8), r = Math.sqrt(.15 + R()*.85); it.push({x:60+Math.cos(th)*rx*r, y:92-Math.sin(th)*ry*r, a:90-th*180/Math.PI+(R()*40-20), s:s0+R()*.5}); }
+        it.sort((p,q) => p.y - q.y);
+        return it.map((l,i) => hp(`translate(${f1(l.x)} ${f1(l.y)}) rotate(${f1(l.a)}) scale(${f1(l.s)})`, i%2?L1:L2)).join('');
+      };
+      if(habit===0){        // cascade: long vines, low crown
+        g += hang(-1, 126+R()*12, 16) + hang(1, 122+R()*14, 16);
+        if(R()>.35) g += hang(-1, 112+R()*10, 10);
+        if(R()>.5) g += hang(1, 110+R()*10, 10);
+        g += mound(8, 24, 12, 1.1);
+      } else if(habit===1){ // bushy: tall full crown, short vines
+        g += hang(-1, 108+R()*8, 9) + hang(1, 106+R()*10, 9);
+        g += mound(16 + Math.floor(R()*5), 30, 26 + R()*10, 1.15);
+      } else {              // climber: up a moss pole, a little spill at the rim
+        const top = 20 + R()*14, px = 60 + (R()*6-3);
+        gb += `<rect x="${f1(px-2.6)}" y="${f1(top)}" width="5.2" height="${f1(96-top)}" rx="2.6" fill="#b58a5e"/><path d="M${f1(px-2.6)} ${f1(top+10)} h5.2 M${f1(px-2.6)} ${f1(top+30)} h5.2 M${f1(px-2.6)} ${f1(top+50)} h5.2" stroke="#8a6440" stroke-width="1" opacity=".5"/>`;
+        let wind = `M${f1(px)} 94`;
+        for(let y=94, k=0; y>top+4; y-=8, k++) wind += ` Q${f1(px+(k%2?-7:7))} ${f1(y-4)} ${f1(px)} ${f1(y-8)}`;
+        gb += `<path d="${wind}" stroke="${L3}" stroke-width="1.5" fill="none"/>`;
+        for(let y=90, k=0; y>top; y-=6.5, k++){ const side = k%2 ? -1 : 1; gb += hp(`translate(${f1(px+side*5)} ${f1(y)}) rotate(${f1(side*(55+R()*30))}) scale(${f1(.95+R()*.4)})`, k%2?L1:L2); }
+        gb += hp(`translate(${f1(px)} ${f1(top+2)}) rotate(${f1(R()*20-10)}) scale(1.1)`, L2);
+        g += hang(R()<.5?-1:1, 110+R()*10, 10) + mound(5, 20, 8, 1);
+      }
+    } else if(type==='palm'){
+      const n = 5 + Math.floor(R()*3), fr = [];
+      for(let i=0;i<n;i++) fr.push({a:-66+i*(132/(n-1))+(R()*10-5), s:.85+R()*.3, c:i%2?L2:L1});
+      fr.sort((p,q)=>Math.abs(q.a)-Math.abs(p.a));
+      for(const f of fr){
+        let cuts=''; for(let k=1;k<=6;k++){ const y = -6-k*7; cuts += `<path d="M-8 ${y+3} L0 ${y-1} L8 ${y+3}" stroke="${tile}" stroke-width="1.6" fill="none"/>`; }
+        g += `<g transform="translate(60 96) rotate(${f1(f.a)}) scale(${f1(f.s)})"><path d="M0 0 C-9 -10 -8 -42 0 -56 C8 -42 9 -10 0 0Z" fill="${f.c}"/><path d="M0 -2 V-52" stroke="${L3}" stroke-width="1.3" opacity=".6"/>${cuts}</g>`;
+      }
+    } else if(type==='bigleaf'){
+      // 떡갈고무나무-style fiddle leaves or 알로카시아-style arrow leaves, two or three of them, big
+      const fiddle = R() < .5;
+      const d = fiddle ? 'M0 2 C-18 1 -24 -12 -19 -22 C-16 -28 -22 -35 -17 -43 C-10 -53 10 -53 17 -43 C22 -35 16 -28 19 -22 C24 -12 18 1 0 2Z'
+                       : 'M0 0 C-8 -1 -25 -6 -25 -20 C-25 -33 -11 -44 0 -58 C11 -44 25 -33 25 -20 C25 -6 8 -1 0 0Z';
+      const n = R() < .55 ? 3 : 2, base = n===3 ? [-42, 2, 40] : [-26, 24], items = [];
+      for(let i=0;i<n;i++){
+        const a = base[i] + (R()*10-5), center = n===3 && i===1, len = (fiddle ? 18 : 22) + R()*12 + (center ? 12 : 0), rad = a*Math.PI/180;
+        items.push({a, x:60+Math.sin(rad)*len, y:98-Math.cos(rad)*len, s:(center ? .95 : .78) + R()*.14, c:i%2?L2:L1, center});
+      }
+      items.sort((p,q) => p.center - q.center);
+      const veins = fiddle
+        ? `<path d="M0 0 V-48 M0 -12 L-12 -20 M0 -12 L12 -20 M0 -26 L-12 -34 M0 -26 L12 -34 M0 -38 L-8 -44 M0 -38 L8 -44" stroke="${L3}" stroke-width="1.3" fill="none" opacity=".45" stroke-linecap="round"/>`
+        : `<path d="M0 -1 V-54 M0 -14 L-17 -18 M0 -14 L17 -18 M0 -28 L-16 -32 M0 -28 L16 -32 M0 -42 L-8 -46 M0 -42 L8 -46" stroke="#fff" stroke-width="1.3" fill="none" opacity=".55" stroke-linecap="round"/>`;
+      for(const it of items){
+        g += `<path d="M60 98 Q${f1(60+(it.x-60)*.3)} ${f1(98-(98-it.y)*.6)} ${f1(it.x)} ${f1(it.y)}" stroke="${L3}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+        g += `<g transform="translate(${f1(it.x)} ${f1(it.y)}) rotate(${f1(it.a*.7)}) scale(${f1(it.s)})"><path d="${d}" fill="${it.c}"/>${ov(d)}${veins}</g>`;
+      }
+    } else if(type==='coin'){
+      // 필레아 / 페페로미아: round leaves on thin stalks, fanned into a dome
+      const n = 7 + Math.floor(R()*3), items = [];
+      for(let i=0;i<n;i++){
+        const a = -76 + i*(152/(n-1)) + (R()*10-5), len = 20 + R()*24 + (Math.abs(a) < 35 ? 8 : 0), rad = a*Math.PI/180;
+        items.push({a, len, x:60+Math.sin(rad)*len*1.05, y:96-Math.cos(rad)*len, r:7+R()*3.5, c:i%2?L2:L1});
+      }
+      items.sort((p,q) => q.len - p.len);
+      for(const it of items){
+        const d = `M${f1(it.x-it.r)} ${f1(it.y)} a${f1(it.r)} ${f1(it.r*.92)} 0 1 0 ${f1(it.r*2)} 0 a${f1(it.r)} ${f1(it.r*.92)} 0 1 0 ${f1(-it.r*2)} 0Z`;
+        g += `<path d="M60 97 Q${f1(60+(it.x-60)*.2)} ${f1(96-it.len*.5)} ${f1(it.x)} ${f1(it.y)}" stroke="${L3}" stroke-width="1.4" fill="none"/>`;
+        g += `<path d="${d}" fill="${it.c}"/>${ov(d)}<circle cx="${f1(it.x)}" cy="${f1(it.y)}" r="1.3" fill="${L3}" opacity=".5"/>`;
+      }
+    } else if(type==='cane'){
+      // 행운목 / 드라세나: bare trunks with a fountain of narrow leaves on top
+      const m = 1 + Math.floor(R()*3), trunks = [];
+      for(let i=0;i<m;i++) trunks.push({x: 60 + (i-(m-1)/2)*13 + (R()*4-2), h: 28 + R()*26});
+      trunks.sort((a,b) => b.h - a.h);
+      const leaf = 'M0 0 C-3.6 -8 -3.6 -25 0 -33 C3.6 -25 3.6 -8 0 0Z';
+      for(const tr of trunks){
+        const top = 98 - tr.h;
+        g += `<rect x="${f1(tr.x-3.6)}" y="${f1(top)}" width="7.2" height="${f1(tr.h)}" rx="2.5" fill="#c9a071"/>`;
+        for(let y = top+6; y < 96; y += 6.5) g += `<path d="M${f1(tr.x-3.6)} ${f1(y)} h7.2" stroke="#95693f" stroke-width="1.1" opacity=".55"/>`;
+        const k = 9 + Math.floor(R()*4), ls = [];
+        for(let i=0;i<k;i++) ls.push({a: -105 + i*(210/(k-1)) + (R()*12-6), s: .62 + R()*.3, c: i%2?L2:L1});
+        ls.sort((p,q) => Math.abs(q.a) - Math.abs(p.a));
+        for(const l of ls){ const tf = `translate(${f1(tr.x)} ${f1(top+2)}) rotate(${f1(l.a)}) scale(${f1(l.s)})`; g += `<path d="${leaf}" transform="${tf}" fill="${l.c}"/>${ov(leaf, tf)}`; }
+      }
+    } else if(type==='twig'){
+      // 올리브 (narrow silvery leaves) or 유칼립투스 (round leaves) on thin woody branches
+      const olive = R() < .5, wood = '#8b6a4a';
+      const topX = 60 + R()*12-6, topY = 22 + R()*10;
+      const main = [60,98, 57,74, 63,50, topX,topY];
+      const branches = [main];
+      const nb = 2 + Math.floor(R()*2);
+      for(let i=0;i<nb;i++){
+        const t = .3 + i*(.4/(nb-1||1)) + R()*.06, bx = bz(main[0],main[2],main[4],main[6],t), by = bz(main[1],main[3],main[5],main[7],t);
+        const side = i%2 ? 1 : -1, ex = bx + side*(18+R()*10), ey = by - (14+R()*12);
+        branches.push([bx,by, bx+side*6,by-4, ex-side*4,ey+6, ex,ey]);
+      }
+      g += branches.map((b,i) => `<path d="M${f1(b[0])} ${f1(b[1])} C${f1(b[2])} ${f1(b[3])} ${f1(b[4])} ${f1(b[5])} ${f1(b[6])} ${f1(b[7])}" stroke="${wood}" stroke-width="${i ? 1.6 : 2.4}" fill="none" stroke-linecap="round"/>`).join('');
+      const lf = olive ? 'M0 0 C-2.2 -2 -2.4 -9 0 -12 C2.4 -9 2.2 -2 0 0Z' : 'M0 0 C-5 -1 -6 -8 0 -10 C6 -8 5 -1 0 0Z';
+      for(const b of branches){
+        const from = b===main ? .3 : .15;
+        for(let t = from; t <= 1.001; t += olive ? .13 : .17){
+          const x = bz(b[0],b[2],b[4],b[6],t), y = bz(b[1],b[3],b[5],b[7],t);
+          for(const side of (t > .97 ? [0] : [-1, 1])) g += `<path d="${lf}" transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(side*(olive ? 52 : 70) + (R()*16-8))}) scale(${f1(.85+R()*.3)})" fill="${R()<.5?L1:L2}"/>`;
+        }
+      }
+    } else if(type==='rosette'){
+      // 칼라테아 / 스파티필룸: broad oval leaves on stalks, with feathered markings
+      const n = 6 + Math.floor(R()*3), items = [];
+      const d = 'M0 0 C-12 -4 -14 -26 0 -36 C14 -26 12 -4 0 0Z';
+      for(let i=0;i<n;i++){
+        const a = -68 + i*(136/(n-1)) + (R()*10-5), len = 12 + R()*12 + (Math.abs(a) < 30 ? 8 : 0), rad = a*Math.PI/180;
+        items.push({a, len, x:60+Math.sin(rad)*len, y:97-Math.cos(rad)*len, s:.78+R()*.26, c:i%2?L2:L1});
+      }
+      items.sort((p,q) => Math.abs(q.a) - Math.abs(p.a));
+      const feather = pid ? '' : [1,2,3,4].map(k => `<path d="M0 ${-5-k*6} l-7 -3.5 M0 ${-5-k*6} l7 -3.5" stroke="${L3}" stroke-width="2" opacity=".38" stroke-linecap="round"/>`).join('');
+      for(const it of items){
+        g += `<path d="M60 97 L${f1(it.x)} ${f1(it.y)}" stroke="${L3}" stroke-width="1.8"/>`;
+        g += `<g transform="translate(${f1(it.x)} ${f1(it.y)}) rotate(${f1(it.a)}) scale(${f1(it.s)})"><path d="${d}" fill="${it.c}"/>${ov(d)}${feather}<path d="M0 -1 V-33" stroke="${L3}" stroke-width="1.1" opacity=".55"/></g>`;
+      }
+    } else if(type==='bush'){
+      // 바질 / 허브 / 피토니아: a dense mound of small cupped leaves
+      const leaf = 'M0 0 C-6 -2 -7 -12 0 -15 C7 -12 6 -2 0 0Z', items = [];
+      const n = 22 + Math.floor(R()*8), rx = 24 + R()*6, ry = 22 + R()*10;
+      for(let i=0;i<n;i++){
+        const th = Math.PI*(.08 + R()*.84), r = Math.sqrt(.1 + R()*.9);
+        const x = 60 + Math.cos(th)*rx*r, y = 94 - Math.sin(th)*ry*r;
+        items.push({x, y, a: 90 - th*180/Math.PI + (R()*30-15), s: .95 + R()*.45, c: R()<.5 ? L1 : L2});
+      }
+      items.sort((p,q) => p.y - q.y);
+      for(const it of items){ const tf = `translate(${f1(it.x)} ${f1(it.y)}) rotate(${f1(it.a)}) scale(${f1(it.s)})`; g += `<path d="${leaf}" transform="${tf}" fill="${it.c}"/>${ov(leaf, tf)}<path d="M0 -1 V-12" transform="${tf}" stroke="${L3}" stroke-width=".9" opacity=".4"/>`; }
+    } else if(type==='cycad'){
+      // 소철: a round scaly caudex with a few stiff, comb-like fronds
+      const cx = 60, cy = 90, n = [1,2,2,3][Math.floor(R()*4)];
+      const fronds = [];
+      for(let i=0;i<n;i++){
+        const a = (n===1 ? R()*16-8 : -38 + i*(76/(n-1))) + (R()*12-6), len = 54 + R()*14 - (n>1 && i!==Math.floor(n/2) ? 6 : 0);
+        fronds.push({a, len});
+      }
+      fronds.sort((p,q) => Math.abs(q.a) - Math.abs(p.a));
+      for(const fr of fronds){
+        const rad = fr.a*Math.PI/180, x0 = cx, y0 = cy-6;
+        const x2 = x0 + Math.sin(rad)*fr.len, y2 = y0 - Math.cos(rad)*fr.len;
+        const x1 = x0 + Math.sin(rad)*fr.len*.2, y1 = y0 - fr.len*.72;          // arches outward near the tip
+        const at = t => [ (1-t)*(1-t)*x0 + 2*(1-t)*t*x1 + t*t*x2, (1-t)*(1-t)*y0 + 2*(1-t)*t*y1 + t*t*y2 ];
+        let lf = [[], []];
+        for(let t=.14; t<=.99; t+=.036){
+          const [x,y] = at(t), [xa,ya] = at(Math.min(1,t+.01)), ang = Math.atan2(ya-y, xa-x);
+          const L = (4 + 7*Math.sin(Math.PI*Math.min(1,(t-.08)/.95))) * (.9 + R()*.2);
+          for(const side of [-1,1]){
+            const aa = ang + side*(Math.PI/2 - .55);   // leaflets sweep forward toward the tip
+            lf[(side+1)/2].push(`M${f1(x)} ${f1(y)}l${f1(Math.cos(aa)*L)} ${f1(Math.sin(aa)*L)}`);
+          }
+        }
+        g += `<path d="${lf[0].join('')}" stroke="${L1}" stroke-width="1.7" stroke-linecap="round" fill="none"/><path d="${lf[1].join('')}" stroke="${L2}" stroke-width="1.7" stroke-linecap="round" fill="none"/>`;
+        g += `<path d="M${f1(x0)} ${f1(y0)} Q${f1(x1)} ${f1(y1)} ${f1(x2)} ${f1(y2)}" stroke="${L3}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+      }
+      g += `<ellipse cx="${cx}" cy="${cy}" rx="10.5" ry="9.5" fill="#a9774b"/>`;
+      g += `<path d="M52 88 q4 -3 8 0 q4 -3 8 0 M54 94 q3 -2.5 6 0 q3 -2.5 6 0 M56 83 q4 -3 8 0" stroke="#7a522f" stroke-width="1.1" fill="none" opacity=".7"/>`;
+      g += `<circle cx="47" cy="95" r="4.6" fill="#e9dccb"/><circle cx="73" cy="95.5" r="4" fill="#d9c9b4"/><circle cx="66" cy="97" r="2.6" fill="#cbb89f"/>`;
+    } else if(type==='asparagus'){
+      // 아스파라거스 (플루모수스): hair-thin wiry stems with flat, airy sprays of needles
+      const n = 3 + Math.floor(R()*3), stems = [];
+      for(let i=0;i<n;i++) stems.push({x: 55 + i*(10/(n-1)) + (R()*3-1.5), top: 10 + R()*36, lean: (i-(n-1)/2)*8 + R()*10-5});
+      const needles = (x, y, dir, len, droop) => {
+        // one horizontal spray: a thin branch with little needle fans along it
+        let d = `M${f1(x)} ${f1(y)}l${f1(dir*len)} ${f1(droop)}`;
+        for(let t=.12; t<=1.001; t+=.15){
+          const px = x + dir*len*t, py = y + droop*t, sc = 1 - t*.5;
+          for(const a of [-140,-95,-50, 40]){
+            const r = (a > 0 ? 2 : 3.2 + R()*1.8) * sc, rr = (a + (R()*16-8)) * Math.PI/180;
+            d += `M${f1(px)} ${f1(py)}l${f1(Math.cos(rr)*r*dir)} ${f1(Math.sin(rr)*r)}`;
+          }
+        }
+        return d;
+      };
+      let wire = '', fine1 = '', fine2 = '';
+      for(const s of stems){
+        const x0 = s.x, x1 = s.x + s.lean, y1 = s.top;
+        wire += `M${f1(x0)} 97 Q${f1(x0 + s.lean*.2)} ${f1((97+y1)/2)} ${f1(x1)} ${f1(y1)}`;
+        const tiers = 1 + Math.floor((97 - y1) / 26);
+        for(let k=0;k<tiers;k++){
+          const t = .35 + k*(.62/Math.max(1,tiers-1)), y = 97 + (y1-97)*t, x = x0 + (x1-x0)*t*t;
+          const dir = (k + stems.indexOf(s)) % 2 ? 1 : -1, len = (14 + R()*14) * (1 - t*.4);
+          const spray = needles(x, y, dir, len, R()*4-1); if(k%2) fine1 += spray; else fine2 += spray;
+        }
+        fine1 += needles(x1, y1, R()<.5?-1:1, 7 + R()*5, 0);
+      }
+      // a low, dense tuft at the base
+      for(let i=0;i<4;i++) fine2 += needles(50 + i*7, 91 - R()*5, i%2 ? 1 : -1, 9 + R()*6, 3);
+      g += `<path d="${wire}" stroke="${L3}" stroke-width=".9" fill="none"/>`;
+      g += `<path d="${fine2}" stroke="${L1}" stroke-width=".8" stroke-linecap="round" fill="none"/><path d="${fine1}" stroke="${L2}" stroke-width=".8" stroke-linecap="round" fill="none"/>`;
+    } else { // flower
+      const bloom = ['var(--bloom1)','var(--bloom2)','var(--bloom3)'][Math.floor(R()*3)];
+      const nb = 1 + Math.floor(R()*3);
+      for(let i=0;i<nb;i++){
+        const x = 60 + (i-(nb-1)/2)*16 + (R()*4-2), y = 30 + R()*14 + (i%2)*8;
+        g += `<path d="M60 98 Q${f1((60+x)/2)} ${f1((98+y)/2+6)} ${f1(x)} ${f1(y)}" stroke="${L3}" stroke-width="1.8" fill="none"/>`;
+        g += `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(R()*72)})">${[0,72,144,216,288].map(r=>`<ellipse rx="5" ry="7.5" cy="-7" transform="rotate(${r})" fill="${bloom}"/>`).join('')}<circle r="4" fill="var(--lime)"/></g>`;
+      }
+      const nl = 4 + Math.floor(R()*2);
+      for(let i=0;i<nl;i++){ const a = -70+i*(140/(nl-1))+(R()*10-5); g += `<g transform="translate(60 97) rotate(${f1(a)}) scale(${f1(.9+R()*.3)})"><path d="M0 0 C-9 -8 -9 -30 0 -38 C9 -30 9 -8 0 0Z" fill="${i%2?L2:L1}"/><path d="M0 -2 V-34" stroke="${L3}" stroke-width="1" opacity=".5"/></g>`; }
+    }
+    if(V.sz !== 1){ const sc = h => h && `<g transform="translate(60 98) scale(${V.sz}) translate(-60 -98)">${h}</g>`; g = sc(g); gb = sc(gb); }
+    if(defs) g = `<defs>${defs}</defs>` + g;
+    const cid = 'pc' + (++clipN), body = potShape(P.pot);
+    const potSvg = `<defs><clipPath id="${cid}"><path d="${body}"/></clipPath></defs><path d="${body}" fill="${pot}"/><g clip-path="url(#${cid})">${potPattern(P.pattern, rng(seed+7))}</g><rect x="26" y="88" width="68" height="11" rx="5.5" fill="${pot}"/><rect x="26" y="88" width="68" height="11" rx="5.5" fill="${NAVY}" opacity=".16"/>`;
+    // trailing vines hang in front of the pot; everything else grows behind the rim
+    const face = o.face===false ? '' : `<g transform="translate(60 114) scale(1.12) translate(-60 -114)">${faceSVG(o.mood||'ok', P)}</g>`;
+    if(o.mood==='late'){ g = `<g transform="rotate(-8 60 98)">${g}</g>`; if(gb) gb = `<g transform="rotate(-8 60 98)">${gb}</g>`; } // wilting lean
+    g = `<g class="sw">${g}</g>`; if(gb) gb = `<g class="sw">${gb}</g>`;
+    const inner = `<g class="bd">${type==='trailing' ? gb + potSvg + g + face : g + potSvg + face}</g>`;
+    // phase is tied to the clock so re-renders don't make the motion jump
+    const sp = f1(.85 + (seed % 7) * .06), dl = -f1(((Date.now()/1000) + (seed % 97)) % 60);
+    const cls = o.still ? 'pl still' : `pl m-${o.mood||'ok'}`;
+    return `<svg class="${cls}" viewBox="0 0 120 140" aria-hidden="true" style="--tile:${o.tile||'var(--mint-soft)'};--potc:${potHex};--sp:${sp};--dl:${dl}s">${inner}</svg>`;
+  }
+  const moodOf = p => { const s = status(p); return s.kind==='ok' ? (s.since===0 ? 'happy' : 'ok') : s.kind; };
+  const pSVG = (p, still=false) => plantSVG(p.type, p.seed, {tile:tileFor(colorOf(p)), color:colorOf(p), mood:moodOf(p), still});
+  const avatar = (p, cls='av') => `<div class="${cls}" style="background:${tileFor(colorOf(p))}">${pSVG(p)}</div>`;
+  const DICE = '<svg class="dice" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5.3" cy="5.3" r="1.25" fill="currentColor"/><circle cx="8" cy="8" r="1.25" fill="currentColor"/><circle cx="10.7" cy="10.7" r="1.25" fill="currentColor"/></svg>';
+  const drop = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5C8 1.5 3 7 3 10.2A5 5 0 0 0 13 10.2C13 7 8 1.5 8 1.5Z" fill="currentColor"/></svg>';
+
+  // ---------- seasons ----------
+  let settings = { winter:[11,12,1,2] };
+  const isWinter = (d=todayStr()) => settings.winter.includes(Number(d.slice(5,7)));
+  const seasonName = (d) => isWinter(d) ? '동절기' : '하절기';
+  const curInterval = p => isWinter() ? p.winterDays : p.intervalDays;
+
+  // ---------- weather (written to db weather/now by a scheduled task, from met.no) ----------
+  let weather = null;
+  const LAT = 37.4837, LNG = 127.0324, PLACE = '서초구';
+  const SKY_LABEL = {clear:'맑음', fair:'대체로 맑음', cloudy:'구름 조금', overcast:'흐림', fog:'안개', rain:'비', snow:'눈', thunder:'뇌우'};
+  function skyOf(sym){
+    const s = String(sym||'').replace(/_(day|night|polartwilight)$/,'');
+    if(/thunder/.test(s)) return 'thunder';
+    if(/snow|sleet/.test(s)) return 'snow';
+    if(/rain|showers/.test(s)) return 'rain';
+    if(s==='fog') return 'fog';
+    if(s==='cloudy') return 'overcast';
+    if(s==='partlycloudy') return 'cloudy';
+    if(s==='fair') return 'fair';
+    if(s==='clearsky') return 'clear';
+    return null;
+  }
+  // sunrise / sunset (standard low-precision solar model, good to a minute or two)
+  function sunTimes(date){
+    const rad = Math.PI/180, dayMs = 864e5, J1970 = 2440588, J2000 = 2451545;
+    const d = date.valueOf()/dayMs - .5 + J1970 - J2000, lw = -LNG*rad, phi = LAT*rad, e = 23.4397*rad;
+    const n = Math.round(d - .0009 - lw/(2*Math.PI)), ds = .0009 + lw/(2*Math.PI) + n;
+    const M = rad*(357.5291 + .98560028*ds), C = rad*(1.9148*Math.sin(M) + .02*Math.sin(2*M) + .0003*Math.sin(3*M));
+    const L = M + C + rad*102.9372 + Math.PI, dec = Math.asin(Math.sin(e)*Math.sin(L));
+    const noon = J2000 + ds + .0053*Math.sin(M) - .0069*Math.sin(2*L);
+    const w = Math.acos((Math.sin(-.833*rad) - Math.sin(phi)*Math.sin(dec)) / (Math.cos(phi)*Math.cos(dec)));
+    const set = J2000 + .0009 + (w+lw)/(2*Math.PI) + n + .0053*Math.sin(M) - .0069*Math.sin(2*L), rise = noon - (set - noon);
+    const toDate = j => new Date((j + .5 - J1970)*dayMs);
+    return {rise: toDate(rise), set: toDate(set)};
+  }
+  function phase(now=new Date()){
+    const mid = new Date(now); mid.setHours(12,0,0,0);
+    const st = sunTimes(mid), rise = st.rise.getTime(), set = st.set.getTime(), t = now.getTime(), m = 60e3;
+    // civil twilight in Seoul lasts ~26-28 min, so the sky reads as "dusk" for 30 min either side of the sun line
+    if(t < rise - 30*m || t > set + 30*m) return 'night';
+    if(t < rise || t > set) return 'dusk';
+    if(t < rise + 40*m || t > set - 60*m) return 'golden';
+    return 'day';
+  }
+  const wxFresh = () => weather && weather.updatedAt && (Date.now() - Date.parse(weather.updatedAt)) < 24*36e5 && skyOf(weather.symbol);
+
+  // sky palettes, all built from the app's lime→mint core: [from, mid, to, white text?]
+  const WX_THEME = {
+    day: {
+      clear:    ['#e6fb4e','#b6f06a','#6ee7c1',0],
+      fair:     ['#dcf659','#aaec84','#71e2c5',0],
+      cloudy:   ['#cfe98c','#a8e0b4','#8ad8c4',0],
+      overcast: ['#bccf9c','#a0c8b4','#88b8ac',0],
+      fog:      ['#dde9c6','#cfe6da','#c1e2d8',0],
+      rain:     ['#588a4a','#2e7c6c','#1d5e5a',1],
+      snow:     ['#cde79e','#b4e1cc','#9cd6c6',0],
+      thunder:  ['#44643a','#26574d','#163e3f',1],
+    },
+    golden: {
+      clear:    ['#d8f53c','#eeea62','#ffc98c',0],
+      fair:     ['#d6f247','#ede46e','#ffc994',0],
+      cloudy:   ['#cfe77e','#e6dc98','#f3c7a2',0],
+      overcast: ['#b9c992','#cfc4a2','#d6b9a4',0],
+      fog:      ['#dfe8c0','#eadfc6','#eed5c6',0],
+      rain:     ['#557044','#5f6250','#584c58',1],
+      snow:     ['#d6eaa6','#e7dcc4','#eecfc2',0],
+      thunder:  ['#3c5232','#443f44','#302a3c',1],
+    },
+    dusk: {   // just after sunset / before sunrise: lime-mint sunk into deep teal, a last lime glow on the right
+      clear:    ['#1d4a45','#2f6b5f','#8fae5e',1],
+      fair:     ['#1f4b46','#316c61','#86a862',1],
+      cloudy:   ['#23494a','#36665f','#7c9c6e',1],
+      overcast: ['#2a4543','#3d5d57','#6f8676',1],
+      fog:      ['#34504d','#4a6862','#7d9285',1],
+      rain:     ['#1a3635','#27504b','#4d6d63',1],
+      snow:     ['#2e5550','#46716a','#8fa99a',1],
+      thunder:  ['#132827','#1f3d3c','#3d5550',1],
+    },
+    night: {   // deep green on the left fading into a clearly blue night on the right
+      clear:    ['#0b2722','#15405a','#2352a3',1],
+      fair:     ['#0c2823','#17425c','#27569f',1],
+      cloudy:   ['#102b27','#1c4658','#30548f',1],
+      overcast: ['#172826','#243f4e','#38507a',1],
+      fog:      ['#1f302d','#2e4752','#465a7e',1],
+      rain:     ['#0c1f1c','#16344a','#244074',1],
+      snow:     ['#193530','#2a5061','#44669c',1],
+      thunder:  ['#091513','#132736','#213261',1],
+    },
+  };
+
+  // flat shapes only (no gradients). Wide screens: art spread across + a sun/moon badge placed with CSS; phones: bottom-right corner.
+  // cloud = a row of overlapping bumps that all sit on one baseline; the end bumps make the rounded ends,
+  // and a fill only between the first and last bump centres keeps the bottom flat without sticking out.
+  // Clouds differ in bump spacing and size; one inner bump is the tallest.
+  function cloudShape(w, h, R){
+    const n = Math.max(3, Math.min(7, Math.round(w/h*1.3))), peak = 1 + Math.floor(R()*(n-2));
+    const rs = Array.from({length:n}, (_, i) => h*(i===peak ? .54 + R()*.08 : i===0 || i===n-1 ? .32 + R()*.08 : .4 + R()*.1));
+    const x0 = rs[0], x1 = w - rs[n-1], step = (x1 - x0)/(n-1);
+    const xs = rs.map((_, i) => i===0 ? x0 : i===n-1 ? x1 : x0 + step*i + (R()-.5)*step*.35);
+    const minR = Math.min(...rs);
+    let o = `<rect x="${f1(x0)}" y="${f1(-minR)}" width="${f1(x1-x0)}" height="${f1(minR)}"/>`;
+    xs.forEach((cx, i) => { o += `<circle cx="${f1(cx)}" cy="${f1(-rs[i])}" r="${f1(rs[i])}"/>`; });
+    return o;
+  }
+  function wxLayer(sky, ph, T){
+    const night = ph==='night' || ph==='dusk', dark = !!T[3];   // dusk already shows the moon
+    const sunC = night ? '#fff4cc' : ph==='golden' ? '#fff2d6' : '#fffbe3';
+    const clC = dark ? '#e6fff4' : '#ffffff';
+    const k = dark ? .32 : 1; // clouds read much stronger on dark skies, so tone them down
+    let ci = 0;
+    // x = left edge, y = baseline, w = width; every cloud gets its own proportions and drift
+    // `top` (e.g. a lightning bolt) rides along with the cloud at full opacity, drawn over it
+    const cloud = (x, y, w, op, top='') => {
+      // height follows the planned size; length stretches or shrinks per cloud, and bump count follows length
+      const R = rng(hashStr(sky + ':' + (ci++))), h = w*(.24 + R()*.04), len = w*(.7 + R()*.6);
+      const anim = `animation-duration:${f1(18 + R()*14)}s;animation-delay:-${f1(R()*20)}s`;
+      const off = (w - len)/2; // keep the cloud centred on its planned spot so longer ones do not run off the edge
+      return `<g transform="translate(${f1(x + off)} ${y})"><g class="cl" fill="${clC}" opacity="${(op*k).toFixed(2)}" style="${anim}">${cloudShape(len, h, R)}</g>${top ? `<g class="cl" style="${anim}"><g transform="translate(${f1(-off)} 0)">${top}</g></g>` : ''}</g>`;
+    };
+    const orb = (x,y,r,id) => night
+      ? `<g class="bob"><mask id="${id}"><rect x="${x-r*2}" y="${y-r*2}" width="${r*4}" height="${r*4}" fill="#fff"/><circle cx="${x+r*.45}" cy="${y-r*.25}" r="${r*.8}" fill="#000"/></mask><circle class="glow" cx="${x}" cy="${y}" r="${r*1.55}" fill="${sunC}" opacity=".1"/><circle cx="${x}" cy="${y}" r="${r*.85}" fill="${sunC}" mask="url(#${id})"/></g>`
+      : `<g class="bob"><circle class="glow" cx="${x}" cy="${y}" r="${r*1.7}" fill="${sunC}" opacity=".22"/><circle class="glow b" cx="${x}" cy="${y}" r="${r*1.3}" fill="${sunC}" opacity=".3"/><circle cx="${x}" cy="${y}" r="${r}" fill="${sunC}"/></g>`;
+    const bolt = (x,y,s) => `<path class="bolt" transform="translate(${x} ${y}) scale(${s})" d="M10 0 L0 18 H8 L2 34 L22 12 H13 L18 0Z" fill="#ffe14a"/>`;
+    const withSun = sky==='clear'||sky==='fair'||sky==='cloudy';
+    let wide = '', narrow = '', badge = '';
+    // wide: 800 units across; text on the left, chips bottom-right
+    const zap = (x,y,sc) => bolt(x, y, sc); // relative to the cloud's baseline-left corner
+    if(sky==='clear') wide += cloud(250, 52, 110, .35);
+    else if(sky==='fair') wide += cloud(318, 66, 140, .45) + cloud(664, 48, 108, .4);
+    else if(sky==='cloudy') wide += cloud(372, 62, 168, .6) + cloud(128, 88, 112, .28) + cloud(652, 46, 118, .55);
+    else if(sky==='overcast') wide += cloud(14, 82, 110, .22) + cloud(176, 50, 132, .35) + cloud(338, 80, 166, .6) + cloud(516, 54, 138, .8) + cloud(668, 64, 124, .9);
+    else if(sky==='fog') wide += cloud(292, 74, 170, .3) + cloud(560, 56, 150, .45);
+    else if(sky==='rain') wide += cloud(96, 70, 128, .25) + cloud(318, 52, 172, .5) + cloud(516, 64, 150, .85) + cloud(672, 50, 118, .75);
+    else if(sky==='thunder') wide += cloud(96, 70, 128, .25) + cloud(516, 64, 150, .85) + cloud(672, 50, 118, .75) + cloud(318, 52, 172, .55, zap(62, -14, 1));
+    else if(sky==='snow') wide += cloud(318, 58, 150, .45) + cloud(516, 66, 150, .9) + cloud(672, 50, 110, .75);
+    // the sun/moon badge sits fully inside the banner (top 10px, 22% from the right)
+    if(withSun){
+      ci = 20;
+      badge = orb(64, 52, 26, 'wxMw') + (sky==='fair' ? cloud(72, 94, 70, .9) : sky==='cloudy' ? cloud(54, 96, 90, .95) : '');
+    }
+    // narrow: 360x200, everything lives bottom-right beside the chips
+    ci = 40;
+    if(withSun) narrow += orb(306, 146, 22, 'wxMn');
+    if(sky==='fair') narrow += cloud(228, 190, 72, .75);
+    else if(sky==='cloudy') narrow += cloud(196, 192, 52, .5) + cloud(238, 178, 92, .9);
+    else if(sky==='overcast') narrow += cloud(222, 154, 112, .85) + cloud(272, 190, 80, .7);
+    else if(sky==='fog') narrow += cloud(230, 168, 112, .45);
+    else if(sky==='rain') narrow += cloud(196, 190, 62, .5) + cloud(226, 162, 118, .85);
+    else if(sky==='thunder') narrow += cloud(196, 190, 62, .5) + cloud(226, 162, 118, .85, zap(52, -12, .85));
+    else if(sky==='snow') narrow += cloud(196, 190, 62, .5) + cloud(226, 162, 118, .9);
+    const fx = (sky==='rain'||sky==='thunder' ? '<div class="wx-rain"></div>' : '') + (sky==='snow' ? '<div class="wx-snow"></div>' : '') + (sky==='fog' ? '<div class="wx-fog"></div>' : '');
+    return `<div class="wx" aria-hidden="true"><div class="wx-grain"></div>${fx ? `<div class="wx-fx">${fx}</div>` : ''}`
+      + `<svg class="wx-art wide" viewBox="0 0 800 160" preserveAspectRatio="xMidYMin slice">${wide}</svg>`
+      + (badge ? `<svg class="wx-orb" viewBox="0 0 150 104">${badge}</svg>` : '')
+      + `<svg class="wx-art narrow" viewBox="0 0 360 200" preserveAspectRatio="xMaxYMax slice">${narrow}</svg>`
+      + `${sky==='thunder' ? '<div class="wx-flash"></div>' : ''}</div>`;
+  }
+  // rain streaks and snowflakes with varied length/size/opacity, built once as seamless tiles
+  (function wxTiles(){
+    const tile = (w, h, n, seed, draw) => {
+      const R = rng(seed); let g = '';
+      for(let i=0;i<n;i++){ const one = draw(R); for(const dx of [-w,0,w]) for(const dy of [-h,0,h]) g += one(dx, dy); }
+      return `url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">${g}</svg>`)}')`;
+    };
+    const streak = (lo, hi, col, oLo, oHi) => R => {
+      const x = R()*220, y = R()*260, l = lo + R()*(hi-lo), o = f1(oLo + R()*(oHi-oLo)), sw = f1(1 + R()*.9);
+      return (dx, dy) => `<path d="M${f1(x+dx)} ${f1(y+dy)}l${f1(-l*.22)} ${f1(l)}" stroke="${col}" stroke-opacity="${o}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    };
+    const flake = (lo, hi, oLo, oHi) => R => {
+      const x = R()*200, y = R()*240, r = f1(lo + R()*(hi-lo)), o = f1(oLo + R()*(oHi-oLo));
+      return (dx, dy) => `<circle cx="${f1(x+dx)}" cy="${f1(y+dy)}" r="${r}" fill="#fff" fill-opacity="${o}"/>`;
+    };
+    // the second layer uses its own tile size, so its random points are scaled into it
+    const scaled = (fn, sx, sy) => R => { const one = fn(() => R()); return (dx, dy) => `<g transform="scale(${sx} ${sy})">${one(dx/sx, dy/sy)}</g>`; };
+    const rainA = tile(220, 260, 16, 71, streak(12, 46, '#ffffff', .25, .6));
+    const rainB = tile(170, 200, 12, 83, scaled(streak(8, 30, '#e8fff4', .15, .4), 170/220, 200/260));
+    const snowA = tile(200, 240, 14, 97, flake(1.4, 3.2, .55, .95));
+    const snowB = tile(160, 180, 12, 113, scaled(flake(.9, 2, .35, .7), 160/200, 180/240));
+    const st = document.createElement('style');
+    st.textContent = `.wx-rain{background-image:${rainA},${rainB}}.wx-snow{background-image:${snowA},${snowB}}`;
+    document.head.appendChild(st);
+  })();
+  // banner greeting: changes every hour. Lines come from the time of day (+ weather when we have it);
+  // the day's order is shuffled once and walked hour by hour, so the same line never shows twice in a row.
+  const HELLO = {
+    morning: ['눈 떴으면 반은 성공한 거야','알람 몇 번 껐어? 솔직하게','아침밥 대신 커피? 그거 밥 아니다','출근길 표정 관리 부탁해','좋은 아침! 이불 밖은 위험했지?','세수는 했지? 아 됐어, 안 물어볼게','지각할 것 같으면 일단 뛰어','오늘의 운세: 커피 한 잔이면 대길'],
+    noon: ['점심 뭐 먹었어? 부러우면 지는 거고','밥 먹고 졸린 건 소화의 증거야','메뉴 고민 5분, 먹는 건 10분','점심시간은 왜 이렇게 빨리 가냐','오늘 점심은 탄수화물 파티였지?'],
+    afternoon: ['오후 3시 졸음은 과학이야, 네 탓 아님','퇴근까지 버티기 모드 ON','딴짓 들킬 뻔했지? 모른 척해줄게','당 떨어질 시간이다, 간식 허가','시계 그만 봐, 안 빨라져','기지개 한 번 켜. 아무도 안 봐'],
+    evening: ['퇴근했으면 오늘 할 일은 끝이야','오늘도 살아남았네, 박수 짝짝','저녁 메뉴 고르기가 제일 큰 업무지','소파가 널 부르고 있어','야근이면… 조용히 응원할게','배달앱 켜는 소리 들렸다','오늘 수고했어. 진심이야'],
+    night: ['이 시간에 뭐 해, 얼른 자','야식은 참아… 아니 오늘만 먹어','새벽 감성 주의보 발령','내일의 너한테 미안하지 않게 자자','유튜브 한 개만 더? 그거 거짓말인 거 알지','폰 내려놓고 눈 좀 붙여'],
+  };
+  function welcome(){
+    const d = new Date(), h = d.getHours();
+    const slot = h>=5&&h<11 ? 'morning' : h>=11&&h<14 ? 'noon' : h>=14&&h<18 ? 'afternoon' : h>=18&&h<23 ? 'evening' : 'night';
+    let pool = [...HELLO[slot]];
+    if(d.getDay()===1 && h<18) pool.push('월요일이다… 힘내 진짜');
+    if(d.getDay()===5 && h>=12) pool.push('금요일이다! 주말까지 조금만');
+    if(d.getDay()===0 || d.getDay()===6) pool.push('주말엔 아무것도 안 해도 돼');
+    if(wxFresh()){
+      const sky = skyOf(weather.symbol), night = phase()==='night' || phase()==='dusk', t = Number(weather.temp);
+      const byWx = {
+        rain: ['우산 챙겼지? 안 챙겼으면 뛰어','비 오는 날엔 파전이 국룰','빗소리 ASMR 무료 제공 중'],
+        thunder: ['천둥 치는 날엔 이불 속이 최고야','번쩍! 방금 사진 찍힌 거 아님'],
+        snow: ['눈 온다! 강아지 모드 ON','눈사람 만들 사람 손','미끄러지지 마, 폼 안 나'],
+        clear: night ? ['달 예쁘다. 너 말고 달'] : ['날씨 미쳤다, 창문 좀 열어봐','이런 날 일하는 거 불법 아니야?'],
+        fair: night ? ['별 보일지도? 고개 한 번 들어봐'] : ['하늘 파란 거 봤어? 한 번 봐'],
+        cloudy: ['구름 좀 꼈네, 선크림은 발라'],
+        overcast: ['하늘도 월요병인가 봐','흐린 날엔 커피가 두 배로 맛있지'],
+        fog: ['안 보이는 건 안개 탓이야, 인생 탓 아님'],
+      }[sky] || [];
+      pool.push(...byWx);
+      if(t>=30) pool.push('밖은 찜질방이야, 나가지 마');
+      if(t<=0) pool.push('손 시리지? 핫팩 챙겨');
+    }
+    // shuffle with a per-day seed, then take the hour's position
+    const R = rng(hashStr(todayStr() + slot + pool.length));
+    for(let i=pool.length-1;i>0;i--){ const j = Math.floor(R()*(i+1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    return pool[h % pool.length];
+  }
+  function wxLine(){
+    const sky = skyOf(weather.symbol), h = Math.floor((Date.now() - Date.parse(weather.updatedAt))/36e5);
+    const parts = [`${PLACE} ${Math.round(Number(weather.temp))}°`, (phase()==='night' || phase()==='dusk') && sky==='clear' ? '맑은 밤' : SKY_LABEL[sky]];
+    if(Number.isFinite(Number(weather.humidity))) parts.push(`습도 ${Math.round(Number(weather.humidity))}%`);
+    if(h>=8) parts.push(`${h}시간 전`);
+    return `<div class="wxline">${esc(parts.join(' · '))}</div>`;
+  }
+  // wraps the banner content; without fresh weather it falls back to the lime→mint banner
+  function wxBanner(content){
+    if(!wxFresh()) return `<section class="banner">${content}</section>`;
+    const sky = skyOf(weather.symbol), ph = phase(), T = WX_THEME[ph][sky];
+    const bg = `linear-gradient(115deg,${T[0]} 0%,${T[1]} 55%,${T[2]} 100%)`;
+    return `<section class="banner wxon${T[3]?' bn-dark':''}" style="background:${bg};--bn-fg:${T[3]?'#ffffff':'#10251d'}">${wxLayer(sky, ph, T)}${content}</section>`;
+  }
+
+  // ---------- status ----------
+  function status(p){
+    const t = todayStr(), last = p.history[0];
+    if(!last) return {kind:'none', label:'기록 없음', rank:-1e9};
+    const since = dn(t)-dn(last), iv = curInterval(p), left = iv - since, next = addDays(last, iv);
+    if(left<0) return {kind:'late', label:`${-left}일 늦음`, rank:left, since, next, left};
+    if(left===0) return {kind:'due', label:'오늘 줄 차례', rank:0, since, next, left};
+    return {kind:'ok', label:`${left}일 남음`, rank:left, since, next, left};
+  }
+  const sinceHTML = s => s.kind==='none' ? `<div class="since"><span>아직 물 한 방울 기록 없음</span></div>`
+    : s.since===0 ? `<div class="since today"><b>오늘</b><span>물 먹음</span></div>`
+    : `<div class="since"><b>${s.since}</b><span>일 지남</span></div>`;
+
+  // ---------- calendar ----------
+  const ymOf = s => s.slice(0,7);
+  const shiftYm = (ym,d) => { let [y,m] = ym.split('-').map(Number); m += d; while(m<1){m+=12;y--;} while(m>12){m-=12;y++;} return `${y}-${pad(m)}`; };
+  const ymLabel = ym => { const [y,m] = ym.split('-').map(Number); return `${y}년 ${m}월`; };
+  function monthDays(ym){
+    const [y,m] = ym.split('-').map(Number), first = `${ym}-01`, start = dn(first) - new Date(Date.UTC(y,m-1,1)).getUTCDay();
+    const last = dn(`${shiftYm(ym,1)}-01`)-1, end = last + (6 - new Date(last*864e5).getUTCDay());
+    const out = []; for(let n=start;n<=end;n++) out.push(fromDn(n)); return out;
+  }
+  const calHead = (ym) => `<div class="cal-head"><h3 class="num">${ymLabel(ym)}</h3><div class="nav">
+    <button data-act="mprev" aria-label="이전 달">‹</button><button data-act="mtoday" aria-label="이번 달" style="font-size:12px;width:auto;padding:0 10px;border-radius:999px">오늘</button><button data-act="mnext" aria-label="다음 달">›</button></div></div>
+    <div class="grid7">${WD.map((w,i)=>`<div class="wd${i===0?' sun':''}">${w}</div>`).join('')}</div>`;
+
+  // ---------- render ----------
+  function render(){
+    const a = document.activeElement;
+    if((a && a.tagName==='INPUT' && a.closest('#app')) || drag.active){ pendingRender = true; return; }
+    pendingRender = false;
+    const t = todayStr();
+    $('#today').textContent = mdw(t);
+    if(!loaded) return;
+    if(!view.month) view.month = ymOf(t);
+    if(view.page==='plant' && !find(view.id)) { view.page='home'; view.id=null; }
+    $('#app').innerHTML = view.page==='plant' ? renderDetail(find(view.id)) : renderHome();
+  }
+
+  function renderHome(){
+    const t = todayStr();
+    const rows = plants.map(p=>({p,s:status(p)})).sort((a,b)=>a.s.rank-b.s.rank || a.p.name.localeCompare(b.p.name,'ko'));
+    const need = rows.filter(r=>r.s.kind==='late'||r.s.kind==='due'||r.s.kind==='none');
+    let banner;
+    const hi = welcome(), sub = t => `<p>${t}</p>`;
+    if(!rows.length) banner = `<div><h2>${hi}</h2>${sub('식물 하나만 데려오면 물 줄 날은 내가 챙길게.')}${wxFresh()?wxLine():''}</div><button class="btn bn-cta" data-act="add">+ 식물 추가</button>`;
+    else if(!need.length) banner = `<div><h2>${hi}</h2>${sub(`다들 아직 촉촉해. 다음 급수는 ${md(rows[0].s.next)}.`)}${wxFresh()?wxLine():''}</div>`;
+    else banner = `<div><h2>${hi}</h2>${wxFresh()?wxLine():''}</div><div class="chips">${need.map(r=>`<button data-act="open" data-id="${r.p.id}" class="${r.s.kind==='late'?'late':''}">${esc(r.p.name)} · ${r.s.label}</button>`).join('')}</div>`;
+
+    // cards keep the order the user set by dragging; urgency only drives the banner chips
+    const byOrder = [...rows].sort((a,b)=>(a.p.order??1e9)-(b.p.order??1e9) || (a.p.createdAt||'').localeCompare(b.p.createdAt||'') || a.p.name.localeCompare(b.p.name,'ko'));
+    const cards = byOrder.map(({p,s})=>{
+      const done = p.history[0]===t;
+      return `<div class="pcard ${s.kind}" role="button" tabindex="0" data-act="open" data-id="${p.id}" aria-label="${esc(p.name)} 상세 보기">
+        ${avatar(p)}
+        <div class="nm"><i class="cdot-name" style="background:${colorOf(p)}"></i>${esc(p.name)}</div>
+        ${sinceHTML(s)}
+        <div class="row"><span class="pill ${s.kind}">${s.label}</span>
+          <button class="qw${done?' on':''}" data-act="water" data-id="${p.id}" aria-pressed="${done}" aria-label="${esc(p.name)} ${done?'오늘 물 준 기록 취소':'오늘 물 줬다고 기록'}" title="${done?'오늘 물 먹음 · 다시 누르면 취소':'오늘 물 줬음'}">${drop}</button></div>
+      </div>`;
+    }).join('') + `<button class="addcard" data-act="add"><span class="plus">+</span>식물 추가</button>`;
+
+    // calendar
+    const ym = view.month, days = monthDays(ym);
+    const byDay = {}, dueDay = {};
+    for(const p of plants){
+      for(const d of p.history) (byDay[d] ||= []).push(p);
+      const s = status(p); if(s.next) (dueDay[s.next] ||= []).push({p, late: s.next < t});
+    }
+    const cells = days.map(d=>{
+      const w = byDay[d]||[], du = dueDay[d]||[];
+      const cls = ['cell', ymOf(d)!==ym?'out':'', d===t?'today':'', view.sel===d?'sel':''].join(' ');
+      const wf = view.filter ? w.filter(p=>p.id===view.filter) : w, df = view.filter ? du.filter(x=>x.p.id===view.filter) : du;
+      const marks = wf.slice(0,6).map(p=>`<span class="cdot" style="background:${colorOf(p)}" title="${esc(p.name)} 물 줌"></span>`).join('') + (wf.length>6?`<span class="more">+${wf.length-6}</span>`:'')
+        + df.map(x=>`<span class="cring${x.late?' late':''}" style="border-color:${colorOf(x.p)}" title="${esc(x.p.name)} 물 줄 날"></span>`).join('');
+      return `<button class="${cls}" data-act="day" data-d="${d}" aria-label="${mdw(d)}${w.length?`, ${w.length}개 물 줌`:''}"><span class="d">${Number(d.slice(8))}</span><div class="cdots">${marks}</div></button>`;
+    }).join('');
+    let panel = '';
+    if(view.sel){
+      const d = view.sel, future = d > t;
+      const du = dueDay[d]||[];
+      panel = `<div class="daypanel"><h4>${mdw(d)}</h4>` + (plants.length ? (future
+        ? (du.length ? `<div class="hint">이 날 물 줄 예정: ${du.map(x=>esc(x.p.name)).join(', ')}</div>` : `<div class="hint">이날은 아무도 안 목말라.</div>`)
+        : `<div class="hint">이날 물 준 애를 눌러서 찍거나 지워.</div><div class="togs">${plants.map(p=>{ const on = p.history.includes(d); return `<button class="tog${on?' on':''}" data-act="toggle" data-id="${p.id}" data-d="${d}" aria-pressed="${on}"><span class="mini" style="background:${tileFor(colorOf(p))}">${pSVG(p, true)}</span>${esc(p.name)}</button>`; }).join('')}</div>`)
+        : `<div class="hint">식물부터 추가해.</div>`) + `</div>`;
+    }
+    const cal = `<section class="cal">${calHead(ym)}<div class="grid7">${cells}</div>
+      <div class="legend"><span><i class="lg-t"></i>오늘</span><span><i class="cdot" style="background:var(--muted)"></i>물 준 날</span><span><i class="cring" style="border-color:var(--muted)"></i>물 줄 날</span><span><i class="cring late" style="border-color:var(--muted)"></i>지난 예정일</span></div>
+      ${plants.length ? `<div class="pfilter${view.filter?' dim':''}">${[...plants].sort((a,b)=>a.name.localeCompare(b.name,'ko')).map(p=>`<button class="pchip" data-act="filter" data-id="${p.id}" aria-pressed="${view.filter===p.id}"><i style="background:${colorOf(p)}"></i>${esc(p.name)}</button>`).join('')}</div><div class="hint" style="margin-top:6px">이름 누르면 걔만 달력에 보여줄게.</div>` : ''}${panel}</section>`;
+
+    return `<div style="display:flex;flex-direction:column;gap:22px">${wxBanner(banner)}
+      ${view.season ? seasonPanel() : ''}
+      <div class="home"><section><div class="sec-head"><h2>내 식물 <span class="num" style="color:var(--muted);font-weight:500">${plants.length}</span></h2><button class="season" data-act="season" aria-expanded="${!!view.season}">지금 <b>${seasonName()}</b> 주기 · 계절 설정</button></div><div class="plants">${cards}</div></section>
+      <section><div class="sec-head"><h2>달력</h2><span class="hint">날짜를 눌러 기록</span></div>${cal}</section></div></div>`;
+  }
+
+  function seasonPanel(){
+    return `<section class="box"><div class="sec-head" style="margin:0"><h3>동절기로 쓸 달</h3><button class="btn ghost" data-act="season">닫기</button></div>
+      <div class="hint">고른 달엔 동절기 주기로 계산해. 나머지 달은 하절기 주기.</div>
+      <div class="months">${Array.from({length:12},(_,i)=>i+1).map(m=>`<button data-act="month" data-m="${m}" aria-pressed="${settings.winter.includes(m)}">${m}월</button>`).join('')}</div></section>`;
+  }
+
+  function renderDetail(p){
+    const t = todayStr(), s = status(p), h = p.history, done = h[0]===t;
+    const gaps = h.slice(0,-1).map((d,i)=>dn(d)-dn(h[i+1]));
+    const avg = gaps.length ? (gaps.reduce((a,b)=>a+b,0)/gaps.length) : null;
+    const ym = view.month, days = monthDays(ym);
+    const hs = new Set(h);
+    const cells = days.map(d=>{
+      const c = ['cell', ymOf(d)!==ym?'out':'', d===t?'today':'', hs.has(d)?'w':''];
+      if(s.next && d===s.next) c.push('nx', s.next<t?'lt':'');
+      if(s.kind==='late' && d>s.next && d<=t) c.push('od');
+      const future = d>t;
+      return `<button class="${c.join(' ')}" ${future?'disabled':''} data-act="toggle" data-id="${p.id}" data-d="${d}" aria-pressed="${hs.has(d)}" aria-label="${mdw(d)}${hs.has(d)?', 물 줌':''}"><span class="d">${Number(d.slice(8))}</span></button>`;
+    }).join('');
+
+    let extra = '';
+    if(view.mode==='edit'){
+      const del = view.confirmDel
+        ? `<span class="hint">물 준 기록까지 싹 날아가.</span><button class="btn danger" data-act="delYes" data-id="${p.id}">삭제 확인</button><button class="btn ghost" data-act="delNo">취소</button>`
+        : `<button class="btn ghost" data-act="delAsk" style="color:var(--late)">식물 삭제</button>`;
+      extra = `<section class="box"><h3>편집</h3><div class="fgrid">
+        <label class="f full">이름<input id="en" maxlength="30" value="${esc(p.name)}"></label>
+        <label class="f">하절기 물 주기 (일)<input id="ei" type="number" min="1" max="365" value="${p.intervalDays}"></label>
+        <label class="f">동절기 물 주기 (일)<input id="ew" type="number" min="1" max="365" value="${p.winterDays}"></label>
+        <div class="full"><div class="label" style="margin-bottom:6px">형태</div><div class="types" role="radiogroup" aria-label="식물 형태">${TYPES.map(([k,l])=>`<button type="button" role="radio" aria-checked="${k===view.editType}" data-act="etype" data-t="${k}">${plantSVG(k, view.editSeed, {tile:tileFor(COLOR[view.editColor]), color:COLOR[view.editColor], mood:'ok', still:true})}${l}</button>`).join('')}</div></div>
+        <div class="full"><div class="label" style="margin-bottom:6px">달력 색</div><div class="swatches" role="radiogroup" aria-label="달력 색">${COLORS.map(([k,h,l])=>`<button type="button" class="sw" role="radio" aria-checked="${k===view.editColor}" aria-label="${l}" title="${l}" data-act="ecolor" data-c="${k}" style="background:${h}"></button>`).join('')}</div></div></div>
+        <div class="acts"><button class="btn lime" data-act="editSave" data-id="${p.id}">저장</button><button class="btn" data-act="eshuffle">${DICE}다시 뽑기</button><button class="btn ghost" data-act="editClose">취소</button><span style="flex:1"></span>${del}</div></section>`;
+    }
+
+    return `<div style="display:flex;flex-direction:column;gap:18px">
+      <button class="btn back" data-act="home">← 전체 식물</button>
+      <section class="hero">
+        <div class="big" style="background:${tileFor(colorOf(p))}">${pSVG(p)}</div>
+        <div class="info">
+          <div><div class="type">${TYPE_LABEL[p.type]} · <span class="${isWinter()?'':'cur'}">하절기 ${p.intervalDays}일</span> / <span class="${isWinter()?'cur':''}">동절기 ${p.winterDays}일</span></div><h2>${esc(p.name)}</h2></div>
+          <div>${sinceHTML(s)}${s.next?`<div class="hint" style="margin-top:4px">마지막 ${mdw(h[0])} · 다음 ${mdw(s.next)}</div>`:''}</div>
+          <div><span class="pill ${s.kind}">${s.label}</span></div>
+          <div class="acts">
+            <button class="btn wbtn${done?' on':''}" data-act="water" data-id="${p.id}" aria-pressed="${done}" title="${done?'다시 누르면 오늘 기록 취소':''}">${drop.replace('<svg','<svg width="14" height="14"')} <span class="lbl">${done?'오늘 물 먹음':'오늘 물 줬음'}</span>${done?'<span class="undo">취소</span>':''}</button>
+            <button class="btn ghost" data-act="edit">편집</button>
+          </div>
+        </div>
+      </section>
+      ${extra}
+      <div class="detail">
+        <section class="box pcal" style="--pc:${colorOf(p)}">${calHead(ym)}<div class="grid7">${cells}</div>
+          <div class="legend"><span><i class="lg-w" style="background:${colorOf(p)}"></i>물 준 날</span><span><i class="lg-n"></i>다음 예정일</span><span><i class="lg-o"></i>늦어진 날</span><span><i class="lg-t"></i>오늘</span></div>
+          <div class="hint">지난 날짜 누르면 물 준 날로 찍거나 지울 수 있어.</div></section>
+        <div style="display:flex;flex-direction:column;gap:22px">
+          <section class="box"><h3>기록 요약</h3><div class="stats">
+            <div class="stat"><b>${h.length}</b><span>물 준 횟수</span></div>
+            <div class="stat"><b>${avg===null?'–':(Math.round(avg*10)/10)+'일'}</b><span>실제 평균 간격</span></div>
+            <div class="stat"><b>${curInterval(p)}일</b><span>지금 주기 (${seasonName()})</span></div></div>
+            ${avg!==null && Math.abs(avg-curInterval(p))>=2 ? `<div class="hint">실제로는 주기랑 ${Math.round(Math.abs(avg-curInterval(p)))}일쯤 어긋나. 흙 한번 만져보고 주기 손봐.</div>`:''}
+          </section>
+          <section class="box"><h3>물 준 기록</h3>
+            ${h.length ? `<ul class="hist">${h.slice(0,60).map((d,i)=>`<li><span class="num">${mdw(d)}${h[i+1]?`<span class="gap">${dn(d)-dn(h[i+1])}일 간격</span>`:'<span class="gap">첫 기록</span>'}</span><button class="x" data-act="rmh" data-id="${p.id}" data-d="${d}" aria-label="${mdw(d)} 기록 삭제">삭제</button></li>`).join('')}</ul>` : `<div class="hint">아직 기록 없음. 위 버튼이나 달력으로 찍어줘.</div>`}
+          </section>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ---------- writes ----------
+  const notice = msg => { const n = $('#notice'); n.textContent = msg||''; n.hidden = !msg; };
+  function write(id, fn){
+    chains[id] = (chains[id]||Promise.resolve()).then(fn).then(()=>notice('')).catch(e => {
+      notice(e && e.code==='quota_exceeded' ? '저장 공간 꽉 찼어. 안 키우는 식물 좀 정리해줘.' :
+             e && e.code==='invalid_argument' ? '여기선 기록을 바꿀 권한이 없어.' : '저장 실패. 잠깐 있다 다시 해봐.');
+    });
+    return chains[id];
+  }
+  const find = id => plants.find(p=>p.id===id);
+  const sortH = arr => [...new Set(arr)].filter(validDate).sort().reverse().slice(0,MAX_HIST);
+  // optimistic local update so the UI reacts before the snapshot arrives
+  function setHistory(p, next){ p.history = sortH(next); render(); write(p.id, () => db.doc('plants/'+p.id).update({history: p.history})); }
+
+  // ---------- events ----------
+  function go(page, id){ view.page = page; view.id = id||null; view.sel = null; view.mode = null; view.confirmDel = false; view.month = ymOf(todayStr()); render(); window.scrollTo({top:0}); }
+
+  $('#app').addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if(!b) return;
+    const act = b.dataset.act, id = b.dataset.id, p = id ? find(id) : find(view.id);
+    if(b.hasAttribute('disabled')) return;
+    switch(act){
+      case 'open': go('plant', id); break;
+      case 'home': go('home'); break;
+      case 'add': openAdd(); break;
+      case 'mprev': view.month = shiftYm(view.month,-1); render(); break;
+      case 'mnext': view.month = shiftYm(view.month,1); render(); break;
+      case 'mtoday': view.month = ymOf(todayStr()); render(); break;
+      case 'day': view.sel = view.sel===b.dataset.d ? null : b.dataset.d; render(); break;
+      case 'filter': view.filter = view.filter===id ? null : id; render(); return;
+      case 'season': view.season = !view.season; render(); return;
+      case 'month': {
+        if(!db) return;
+        const m = Number(b.dataset.m), w = settings.winter.includes(m) ? settings.winter.filter(x=>x!==m) : [...settings.winter, m].sort((a,b)=>a-b);
+        settings = {...settings, winter:w}; render();
+        write('__settings', () => db.doc('settings/app').set({winterMonths:w})); return;
+      }
+    }
+    if(!db || !p) return;
+    switch(act){
+      case 'water': { e.stopPropagation(); const t = todayStr(); setHistory(p, p.history[0]===t ? p.history.filter(x=>x!==t) : [t, ...p.history]); break; }
+      case 'toggle': { const d = b.dataset.d; if(d>todayStr()) return; setHistory(p, p.history.includes(d) ? p.history.filter(x=>x!==d) : [d, ...p.history]); break; }
+      case 'rmh': setHistory(p, p.history.filter(x=>x!==b.dataset.d)); break;
+      case 'edit': view.mode = view.mode==='edit' ? null : 'edit'; view.editType = p.type; view.editSeed = p.seed; view.editColor = p.color; view.confirmDel=false; render(); break;
+      case 'editClose': view.mode = null; render(); break;
+      case 'etype': if(b.dataset.t!==view.editType) view.editSeed = distinctSeed(b.dataset.t, view.editColor, p.id); view.editType = b.dataset.t; render(); break;
+      case 'ecolor': view.editColor = b.dataset.c; render(); break;
+      case 'eshuffle': view.editSeed = distinctSeed(view.editType, view.editColor, p.id); render(); break;
+      case 'editSave': {
+        const n = $('#en').value.trim(), iv = parseInt($('#ei').value,10), wv = parseInt($('#ew').value,10);
+        if(!n || !(iv>=1&&iv<=365) || !(wv>=1&&wv<=365)) { notice('이름이랑 1~365 사이 물 주기 넣어줘.'); return; }
+        Object.assign(p, {name:n, intervalDays:iv, winterDays:wv, type:view.editType, seed:view.editSeed, color:view.editColor});
+        view.mode = null; b.blur(); render();
+        write(p.id, () => db.doc('plants/'+p.id).update({name:n, intervalDays:iv, winterDays:wv, type:p.type, seed:p.seed, color:p.color})); break;
+      }
+      case 'delAsk': view.confirmDel = true; render(); break;
+      case 'delNo': view.confirmDel = false; render(); break;
+      case 'delYes': write(p.id, () => db.doc('plants/'+p.id).delete()); plants = plants.filter(x=>x!==p); go('home'); break;
+    }
+  });
+  $('#app').addEventListener('keydown', e => {
+    if((e.key==='Enter'||e.key===' ') && e.target.classList.contains('pcard')){ e.preventDefault(); go('plant', e.target.dataset.id); }
+  });
+  document.addEventListener('focusout', () => setTimeout(()=>{ if(pendingRender) render(); }, 0));
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) render(); });
+  // re-render when the day or the sky phase (day / golden hour / night) changes
+  const tickKey = () => todayStr() + phase() + new Date().getHours();
+  let tick = tickKey();
+  setInterval(() => { const k = tickKey(); if(k!==tick){ tick = k; render(); } }, 60*1000);
+
+  // ---------- add sheet ----------
+  const add = { type:'ficus', seed:1, manual:false, color:'mint', winterManual:false };
+  function drawAdd(){
+    const tile = tileFor(COLOR[add.color]);
+    $('#addPrev').style.background = tile;
+    $('#addPrev').innerHTML = plantSVG(add.type, add.seed, {tile, color:COLOR[add.color], mood:'happy'});
+    $('#addTypes').innerHTML = TYPES.map(([k,l])=>`<button type="button" role="radio" aria-checked="${k===add.type}" data-t="${k}">${plantSVG(k, add.seed, {tile, color:COLOR[add.color], mood:'ok', still:true})}${l}</button>`).join('');
+    $('#addColors').innerHTML = COLORS.map(([k,h,l])=>`<button type="button" class="sw" role="radio" aria-checked="${k===add.color}" aria-label="${l}" title="${l}" data-c="${k}" style="background:${h}"></button>`).join('');
+  }
+  function openAdd(){
+    if(!db){ notice('저장소랑 연결이 안 돼서 식물을 못 넣어.'); return; }
+    const c0 = freeColor();
+    Object.assign(add, {type:'ficus', seed:distinctSeed('ficus', c0), manual:false, color:c0, winterManual:false});
+    $('#addForm').reset(); $('#addInterval').value = 7; $('#addWinter').value = 14; $('#addLast').value = todayStr(); $('#addLast').max = todayStr();
+    drawAdd(); $('#scrim').hidden = false; setTimeout(()=>$('#addName').focus(), 30);
+  }
+  const closeAdd = () => { $('#scrim').hidden = true; };
+  $('#addClose').addEventListener('click', closeAdd);
+  $('#scrim').addEventListener('click', e => { if(e.target.id==='scrim') closeAdd(); });
+  document.addEventListener('keydown', e => { if(e.key==='Escape' && !$('#scrim').hidden) closeAdd(); });
+  $('#addName').addEventListener('input', () => { if(!add.manual){ const g = guessType($('#addName').value); if(g!==add.type){ add.type = g; add.seed = distinctSeed(g, add.color); drawAdd(); } } });
+  $('#addTypes').addEventListener('click', e => { const b = e.target.closest('[data-t]'); if(!b) return; if(b.dataset.t!==add.type) add.seed = distinctSeed(b.dataset.t, add.color); add.type = b.dataset.t; add.manual = true; drawAdd(); });
+  $('#addColors').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if(!b) return; add.color = b.dataset.c; drawAdd(); });
+  $('#addInterval').addEventListener('input', () => { const v = parseInt($('#addInterval').value,10); if(!add.winterManual && v>=1) $('#addWinter').value = Math.min(365, v*2); });
+  $('#addWinter').addEventListener('input', () => { add.winterManual = true; });
+  $('#addShuffle').addEventListener('click', () => { add.seed = distinctSeed(add.type, add.color); drawAdd(); });
+  $('#addForm').addEventListener('submit', e => {
+    e.preventDefault(); if(!db) return;
+    const name = $('#addName').value.trim(), iv = parseInt($('#addInterval').value,10), wv = parseInt($('#addWinter').value,10), last = $('#addLast').value;
+    if(!name || !(iv>=1 && iv<=365) || !(wv>=1 && wv<=365)) return;
+    const ref = db.collection('plants').doc();
+    const body = {name, intervalDays:iv, winterDays:wv, type:add.type, seed:add.seed, color:add.color, history: validDate(last) && last<=todayStr() ? [last] : [], createdAt:new Date().toISOString(),
+      order: plants.reduce((m,p)=>Math.max(m, p.order??-1), plants.length-1) + 1};
+    write(ref.id, () => ref.set(body));
+    closeAdd();
+  });
+
+  // ---------- drag to reorder (mouse: press and move; touch: press and hold, then move) ----------
+  // Grid cells never move during a drag, only which card sits in them. So the cell rects are measured once
+  // (page coordinates) and every hit test / position uses them: no layout reads per move, and no flicker
+  // from hit-testing cards that are still sliding.
+  const drag = { el:null, id:null, pid:null, x0:0, y0:0, x:0, y:0, offX:0, offY:0, active:false, timer:0, vy:0, raf:0, frame:0, slots:[], idx:0, justDropped:false };
+  const cardsOf = () => [...document.querySelectorAll('.plants .pcard')];
+  const pageRect = el => { const r = el.getBoundingClientRect(); return {x:r.left+scrollX, y:r.top+scrollY, w:r.width, h:r.height}; };
+  function placeDragged(){
+    const s = drag.slots[drag.idx];
+    drag.el.style.transform = `translate3d(${drag.x + scrollX - drag.offX - s.x}px, ${drag.y + scrollY - drag.offY - s.y}px, 0) scale(1.04) rotate(-1.5deg)`;
+  }
+  function slotAt(){
+    const px = drag.x + scrollX, py = drag.y + scrollY;
+    // must be well inside a cell (inner 70%) before we swap, so hovering near an edge never ping-pongs
+    return drag.slots.findIndex(s => px > s.x + s.w*.15 && px < s.x + s.w*.85 && py > s.y + s.h*.15 && py < s.y + s.h*.85);
+  }
+  function reorderUnder(){
+    const to = slotAt(); if(to < 0 || to === drag.idx) return;
+    const cards = cardsOf(), from = drag.idx;
+    const moving = cards.filter(c => c !== drag.el && (() => { const i = cards.indexOf(c); return i >= Math.min(from,to) && i <= Math.max(from,to); })());
+    const before = new Map(moving.map(c => [c, c.getBoundingClientRect()]));
+    const ref = cards[to];
+    ref.parentNode.insertBefore(drag.el, to > from ? ref.nextSibling : ref);
+    drag.idx = to;
+    for(const c of moving){
+      // `a` is where the card is on screen right now (even mid-slide); measure its new cell without any transform
+      c.style.transition = 'none'; c.style.transform = '';
+      const a = before.get(c), b = c.getBoundingClientRect();
+      c.style.transform = `translate3d(${a.left - b.left}px, ${a.top - b.top}px, 0)`;
+    }
+    requestAnimationFrame(() => { for(const c of moving){ c.style.transition = 'transform .24s cubic-bezier(.2,.8,.2,1)'; c.style.transform = ''; } });
+    placeDragged();
+  }
+  function frame(){
+    drag.frame = 0;
+    if(!drag.active) return;
+    if(drag.vy) window.scrollBy(0, drag.vy);
+    placeDragged(); reorderUnder();
+    if(drag.vy) drag.frame = requestAnimationFrame(frame);
+  }
+  const schedule = () => { if(!drag.frame) drag.frame = requestAnimationFrame(frame); };
+  function startDrag(){
+    const el = drag.el; clearTimeout(drag.timer);
+    const cards = cardsOf();
+    for(const c of cards){ c.style.transition = 'none'; c.style.transform = ''; }
+    drag.slots = cards.map(pageRect); drag.idx = cards.indexOf(el);
+    const s = drag.slots[drag.idx]; drag.offX = drag.x + scrollX - s.x; drag.offY = drag.y + scrollY - s.y;
+    drag.active = true;
+    el.classList.add('dragging'); document.body.classList.add('dragging-any');
+    if(navigator.vibrate) try{ navigator.vibrate(12); }catch(_){}
+    placeDragged();
+  }
+  function endDrag(commit){
+    clearTimeout(drag.timer); cancelAnimationFrame(drag.frame); drag.frame = 0;
+    const el = drag.el, was = drag.active;
+    drag.el = null; drag.active = false; drag.pid = null; drag.vy = 0;
+    document.body.classList.remove('dragging-any');
+    if(!el || !was) return;
+    drag.justDropped = true; setTimeout(() => { drag.justDropped = false; }, 60);
+    // settle into the slot, then save the new order
+    el.style.transition = 'transform .18s ease'; el.style.transform = '';
+    setTimeout(() => {
+      el.classList.remove('dragging'); el.style.transition = '';
+      if(commit) saveOrder(cardsOf().map(c => c.dataset.id));
+      else render();
+    }, 190);
+  }
+  function saveOrder(ids){
+    ids.forEach((id, i) => {
+      const p = find(id); if(!p || p.order===i) return;
+      p.order = i; write(id, () => db.doc('plants/'+id).update({order: i}));
+    });
+    render();
+  }
+  $('#app').addEventListener('pointerdown', e => {
+    const el = e.target.closest('.plants .pcard');
+    if(!el || e.target.closest('.qw') || (e.pointerType==='mouse' && e.button!==0) || !db) return;
+    drag.el = el; drag.id = el.dataset.id; drag.pid = e.pointerId;
+    drag.x0 = drag.x = e.clientX; drag.y0 = drag.y = e.clientY;
+    if(e.pointerType!=='mouse') drag.timer = setTimeout(startDrag, 380);
+  });
+  window.addEventListener('pointermove', e => {
+    if(!drag.el || e.pointerId!==drag.pid) return;
+    drag.x = e.clientX; drag.y = e.clientY;
+    const moved = Math.hypot(drag.x-drag.x0, drag.y-drag.y0);
+    if(!drag.active){
+      if(e.pointerType==='mouse'){ if(moved > 6) startDrag(); else return; }
+      else { if(moved > 10){ clearTimeout(drag.timer); drag.el = null; } return; } // moving before the hold means scrolling
+    }
+    const edge = 70, h = window.innerHeight;
+    drag.vy = drag.y < edge ? -Math.ceil((edge-drag.y)/6) : drag.y > h-edge ? Math.ceil((drag.y-(h-edge))/6) : 0;
+    schedule(); // at most one position/swap update per frame
+  });
+  window.addEventListener('pointerup', e => { if(drag.el && e.pointerId===drag.pid) endDrag(true); });
+  window.addEventListener('pointercancel', e => { if(drag.el && e.pointerId===drag.pid) endDrag(drag.active); });
+  // while a card is held, the page must not scroll or pop the long-press menu
+  document.addEventListener('touchmove', e => { if(drag.active) e.preventDefault(); }, {passive:false});
+  $('#app').addEventListener('contextmenu', e => { if(e.target.closest('.plants .pcard')) e.preventDefault(); });
+  // the click that ends a drag must not open the plant
+  $('#app').addEventListener('click', e => { if(drag.justDropped || drag.active){ e.stopPropagation(); e.preventDefault(); } }, true);
+
+  // ---------- storage: this browser only (localStorage), same shape as the old artifact db ----------
+  // { plants: {id: doc}, settings: {app: {...}} }
+  const LS_KEY = 'after-rain:v1';
+  function localDB(){
+    let data;
+    const load = () => { try { data = JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(_) { data = {}; } data.plants ||= {}; data.settings ||= {}; };
+    load();
+    const subs = new Set();
+    const emit = () => subs.forEach(fn => fn());
+    const save = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) { throw Object.assign(new Error('save failed'), {code: 'quota_exceeded'}); } emit(); };
+    // another tab or the installed app changed the data
+    window.addEventListener('storage', e => { if(e.key === LS_KEY){ load(); emit(); } });
+    const split = path => { const [col, id] = path.split('/'); return [col, id]; };
+    const snapDoc = (col, id) => { const v = (data[col]||{})[id]; return {id, exists: !!v, data: () => v ? JSON.parse(JSON.stringify(v)) : undefined}; };
+    const docRef = (col, id) => ({
+      id,
+      onSnapshot(cb){ const f = () => cb(snapDoc(col, id)); subs.add(f); f(); return () => subs.delete(f); },
+      async set(v){ (data[col] ||= {})[id] = JSON.parse(JSON.stringify(v)); save(); },
+      async update(v){ const cur = (data[col] ||= {})[id] || {}; data[col][id] = {...cur, ...JSON.parse(JSON.stringify(v))}; save(); },
+      async delete(){ if(data[col]) delete data[col][id]; save(); },
+    });
+    return {
+      doc: path => docRef(...split(path)),
+      collection: col => ({
+        doc: () => docRef(col, 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7)),
+        onSnapshot(cb){ const f = () => cb({docs: Object.keys(data[col]||{}).map(id => snapDoc(col, id))}); subs.add(f); f(); return () => subs.delete(f); },
+      }),
+      exportAll: () => JSON.stringify({app: 'after-rain', version: 1, savedAt: new Date().toISOString(), ...data}, null, 2),
+      importAll(json){
+        const v = JSON.parse(json);
+        if(!v || typeof v.plants !== 'object') throw new Error('not a backup');
+        data = {plants: v.plants || {}, settings: v.settings || {}}; save();
+      },
+    };
+  }
+
+  // ---------- weather: straight from Open-Meteo in the browser (free, no key), cached for an hour ----------
+  const WX_KEY = 'after-rain:weather';
+  // WMO weather codes -> the met.no-style symbols the banner already understands
+  function wmoSymbol(code, isDay){
+    const c = Number(code), sfx = isDay ? '_day' : '_night';
+    if(c === 0) return 'clearsky' + sfx;
+    if(c === 1) return 'fair' + sfx;
+    if(c === 2) return 'partlycloudy' + sfx;
+    if(c === 3) return 'cloudy';
+    if(c === 45 || c === 48) return 'fog';
+    if(c >= 95) return 'rainandthunder';
+    if((c >= 71 && c <= 77) || c === 85 || c === 86) return 'snow';
+    if((c >= 51 && c <= 67) || (c >= 80 && c <= 82)) return 'rain';
+    return null;
+  }
+  async function refreshWeather(force){
+    try { const c = JSON.parse(localStorage.getItem(WX_KEY)); if(c && c.updatedAt){ weather = c; render(); if(!force && Date.now() - Date.parse(c.updatedAt) < 60*60e3) return; } } catch(_) {}
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LNG}&current=temperature_2m,relative_humidity_2m,weather_code,is_day&timezone=Asia%2FSeoul`;
+      const r = await fetch(url, {cache: 'no-store'}); if(!r.ok) return;
+      const cur = (await r.json()).current || {}, symbol = wmoSymbol(cur.weather_code, cur.is_day);
+      if(!symbol || !Number.isFinite(cur.temperature_2m)) return;
+      weather = {symbol, temp: cur.temperature_2m, humidity: cur.relative_humidity_2m, updatedAt: new Date().toISOString(), source: 'open-meteo'};
+      try { localStorage.setItem(WX_KEY, JSON.stringify(weather)); } catch(_) {}
+      render();
+    } catch(_) { /* offline: keep whatever we had */ }
+  }
+
+  // ---------- backup (this browser is the only copy, so offer a file) ----------
+  function wireBackup(){
+    const box = document.getElementById('backup'); if(!box) return;
+    box.addEventListener('click', e => {
+      const b = e.target.closest('[data-bk]'); if(!b || !db) return;
+      if(b.dataset.bk === 'save'){
+        const blob = new Blob([db.exportAll()], {type: 'application/json'}), a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = `비온뒤맑음-백업-${todayStr()}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      } else document.getElementById('bkFile').click();
+    });
+    document.getElementById('bkFile').addEventListener('change', async e => {
+      const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+      try { db.importAll(await f.text()); notice(''); go('home'); } catch(_) { notice('이 파일은 백업 파일이 아닌 것 같아.'); }
+    });
+  }
+
+  // ---------- boot ----------
+  render();
+  Promise.resolve(localDB()).then(d => {
+    db = d; loaded = true;
+    if(!db){ plants = []; render(); notice('저장소랑 연결이 안 돼서 기록을 못 불러와.'); return; }
+    db.collection('plants').onSnapshot(snap => {
+      plants = snap.docs.filter(x=>x.exists).map(x => {
+        const v = x.data()||{}, name = String(v.name||'이름 없음');
+        const iv = Math.max(1, parseInt(v.intervalDays,10)||7);
+        return { id:x.id, name, intervalDays: iv, winterDays: Math.max(1, parseInt(v.winterDays,10)||Math.min(365, iv*2)),
+          type: TYPE_LABEL[v.type] ? v.type : guessType(name),
+          seed: Number.isFinite(v.seed) ? v.seed>>>0 : hashStr(x.id),
+          color: COLOR[v.color] ? v.color : COLORS[hashStr(x.id)%COLORS.length][0],
+          history: Array.isArray(v.history) ? sortH(v.history) : [],
+          order: Number.isFinite(v.order) ? v.order : null, createdAt: typeof v.createdAt==='string' ? v.createdAt : '' };
+      });
+      render();
+    }, () => notice('기록을 못 불러왔어. 새로고침 한 번만.'));
+    wireBackup();
+    refreshWeather(); setInterval(() => refreshWeather(), 30*60e3);
+    document.addEventListener('visibilitychange', () => { if(!document.hidden) refreshWeather(); });
+    db.doc('settings/app').onSnapshot(d => {
+      const w = d.exists && Array.isArray((d.data()||{}).winterMonths) ? d.data().winterMonths.map(Number).filter(m=>m>=1&&m<=12) : null;
+      if(w){ settings = {...settings, winter:w}; render(); }
+    }, () => {});
+  }).catch(()=>{ loaded = true; render(); notice('저장소랑 연결이 안 돼.'); });
+})();
+</script>
+
+</body>
+</html>
