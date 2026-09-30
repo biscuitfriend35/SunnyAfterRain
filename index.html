@@ -22,7 +22,7 @@
   --bg:#f3fbf7; --surface:#ffffff; --fg:#10251d; --muted:#5a6f66; --line:#dcece4;
   --lime:#d4f53c; --lime-soft:#f1fbcb; --on-lime:#10251d;
   --mint:#6ee7c1; --mint-soft:#ddf8ee; --mint-deep:#0f8f68;
-  --idle:#e1eae6; --idle-fg:#6f8a80; --idle-hover:#d3e6de; --daisy-edge:#a9dcc6;
+  --idle:#e1eae6; --idle-fg:#6f8a80; --idle-hover:#d3e6de; --daisy-edge:#a9dcc6; --title-a:#6f9f12; --title-b:#0f8f68;
   --late:#e2552f; --late-soft:#fde4dc;
   --leaf-a:#34c99a; --leaf-b:#8fdb4e; --leaf-c:#137a5a;
   --tile1:#ddf8ee; --tile2:#f1fbcb;
@@ -36,7 +36,7 @@
   --bg:#0d1613; --surface:#15201c; --fg:#e6f2ec; --muted:#93a89f; --line:#24352e;
   --lime:#d4f53c; --lime-soft:#2b3413; --on-lime:#10251d;
   --mint:#6ee7c1; --mint-soft:#15302a; --mint-deep:#6ee7c1;
-  --idle:#223029; --idle-fg:#8fa79d; --idle-hover:#2a3d35; --daisy-edge:#4fae8c;
+  --idle:#223029; --idle-fg:#8fa79d; --idle-hover:#2a3d35; --daisy-edge:#4fae8c; --title-a:#d4f53c; --title-b:#6ee7c1;
   --late:#ff8a66; --late-soft:#3a2119;
   --leaf-a:#3ed6a5; --leaf-b:#a6e85e; --leaf-c:#0b5a42;
   --tile1:#173a30; --tile2:#2f3a14;
@@ -46,7 +46,7 @@
   --bg:#0d1613; --surface:#15201c; --fg:#e6f2ec; --muted:#93a89f; --line:#24352e;
   --lime:#d4f53c; --lime-soft:#2b3413; --on-lime:#10251d;
   --mint:#6ee7c1; --mint-soft:#15302a; --mint-deep:#6ee7c1;
-  --idle:#223029; --idle-fg:#8fa79d; --idle-hover:#2a3d35; --daisy-edge:#4fae8c;
+  --idle:#223029; --idle-fg:#8fa79d; --idle-hover:#2a3d35; --daisy-edge:#4fae8c; --title-a:#d4f53c; --title-b:#6ee7c1;
   --late:#ff8a66; --late-soft:#3a2119;
   --leaf-a:#3ed6a5; --leaf-b:#a6e85e; --leaf-c:#0b5a42;
   --tile1:#173a30; --tile2:#2f3a14;
@@ -85,7 +85,7 @@ input:focus{border-color:var(--mint)}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px}
 .brand .logo{width:32px;height:32px;flex:none;display:block}
-.brand h1{font-size:24px}
+.brand h1{font-size:19px;letter-spacing:-.01em;background:linear-gradient(90deg,var(--title-a),var(--title-b));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .date{color:var(--muted);font-size:13px}
 
 /* today banner */
