@@ -396,6 +396,12 @@ if(/[?&]debug/.test(location.search)){
   if(window.visualViewport) visualViewport.addEventListener('resize', () => log('viewport h='+Math.round(visualViewport.height)));
   window.addEventListener('blur', () => log('window blur')); window.addEventListener('focus', () => log('window focus'));
   log('debug on · ' + navigator.userAgent.slice(0, 80));
+  // a bare test field outside every app container: does the keyboard come up here?
+  document.addEventListener('DOMContentLoaded', () => {
+    const t = document.createElement('input'); t.id = 'dbgInput'; t.placeholder = '테스트 입력칸 (앱 바깥)';
+    t.style.cssText = 'display:block;width:calc(100% - 24px);margin:12px;padding:12px;font-size:16px;border:2px solid #f0a;border-radius:10px;background:#fff;color:#000';
+    document.body.insertBefore(t, document.body.firstChild);
+  });
 }
 </script>
 </head>
@@ -409,7 +415,7 @@ if(/[?&]debug/.test(location.search)){
   </div>
   <div class="notice" id="notice" hidden></div>
   <main id="app"><div class="empty"><strong>화분 세는 중…</strong>잠깐만 기다려.</div></main>
-  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v0930.0425</span></footer>
+  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v0930.0428</span></footer>
 </div>
 
 <div class="scrim" id="scrim" hidden>
