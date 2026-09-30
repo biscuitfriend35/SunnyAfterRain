@@ -84,7 +84,10 @@ input:focus{border-color:var(--mint)}
 /* header */
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px}
-.brand .logo{width:32px;height:32px;flex:none;display:block}
+.brand .logo{width:32px;height:32px;flex:none;display:block;transform-origin:50% 50%;animation:pinwheel 9s linear infinite}
+/* spins like a pinwheel: a steady turn, then a gust whips it round before it slows again */
+@keyframes pinwheel{0%{transform:rotate(0deg)}35%{transform:rotate(80deg)}48%{transform:rotate(250deg);animation-timing-function:ease-out}70%{transform:rotate(330deg)}100%{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.brand .logo{animation:none}}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .brand h1{font-size:19px;letter-spacing:-.01em;background:linear-gradient(90deg,var(--title-a),var(--title-b));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .date{color:var(--muted);font-size:13px}
