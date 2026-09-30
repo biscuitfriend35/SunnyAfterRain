@@ -61,6 +61,7 @@ button{font:inherit;cursor:pointer;color:inherit;background:none;border:none;pad
 button:focus-visible,input:focus-visible{outline:2px solid var(--mint-deep);outline-offset:2px}
 input{font:inherit;color:var(--fg);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;min-width:0}
 input:focus{border-color:var(--mint)}
+@media (pointer: coarse){input{font-size:16px}}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;padding:9px 16px;font-weight:600;font-size:14px;white-space:nowrap;border:1.5px solid var(--line);background:var(--surface)}
 .btn:hover{border-color:var(--mint)}
 .btn .dice{width:14px;height:14px;margin-right:5px;vertical-align:-2px}
@@ -370,6 +371,7 @@ html,body{margin:0}
 .backup{display:flex;justify-content:center;gap:14px;font-size:12px;color:var(--muted);padding-top:8px}
 .backup button{background:none;border:0;padding:4px 2px;color:inherit;font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
 .backup button:hover{color:var(--fg)}
+.backup .ver{opacity:.5;padding:4px 0}
 </style>
 
 </head>
@@ -383,7 +385,7 @@ html,body{margin:0}
   </div>
   <div class="notice" id="notice" hidden></div>
   <main id="app"><div class="empty"><strong>화분 세는 중…</strong>잠깐만 기다려.</div></main>
-  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden></footer>
+  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v0930.0413</span></footer>
 </div>
 
 <div class="scrim" id="scrim" hidden>
@@ -397,7 +399,7 @@ html,body{margin:0}
       </div>
     </div>
     <div class="fgrid">
-      <label class="f full">식물 이름<input id="addName" required maxlength="30" placeholder="예: 몬스테라"></label>
+      <label class="f full">식물 이름<input id="addName" type="text" inputmode="text" enterkeyhint="next" autocapitalize="off" autocorrect="off" spellcheck="false" required maxlength="30" placeholder="예: 몬스테라"></label>
       <div class="full"><div class="label" style="margin-bottom:6px">형태</div><div class="types" id="addTypes" role="radiogroup" aria-label="식물 형태"></div></div>
       <div class="full"><div class="label" style="margin-bottom:6px">달력 색</div><div class="swatches" id="addColors" role="radiogroup" aria-label="달력 색"></div></div>
       <label class="f">하절기 물 주기 (일)<input id="addInterval" type="number" min="1" max="365" required value="7"></label>
@@ -1355,9 +1357,9 @@ html,body{margin:0}
     Object.assign(add, {type:'ficus', seed:distinctSeed('ficus', c0), manual:false, color:c0, winterManual:false});
     $('#addForm').reset(); $('#addInterval').value = 7; $('#addWinter').value = 14; $('#addLast').value = todayStr(); $('#addLast').max = todayStr();
     drawAdd(); $('#scrim').hidden = false;
-    // Only auto-focus with a mouse. On phones (iOS especially) a focus() fired outside the tap leaves the field
-    // focused without a keyboard, and tapping the already-focused field then never brings the keyboard up.
-    if(matchMedia('(pointer: fine)').matches) setTimeout(()=>$('#addName').focus(), 30);
+    // Focus right here, inside the tap that opened the sheet: iOS only raises the keyboard for a focus() made
+    // during a user gesture (a delayed focus() leaves the field focused with no keyboard).
+    try { $('#addName').focus({preventScroll: true}); } catch(_) {}
   }
   const closeAdd = () => { $('#scrim').hidden = true; };
   $('#addClose').addEventListener('click', closeAdd);
