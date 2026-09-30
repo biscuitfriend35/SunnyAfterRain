@@ -54,7 +54,7 @@
   --bloom1:#ff8fab; --bloom2:#b8a5ff; --bloom3:#ffd84a; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:24px 72px;display:flex;flex-direction:column;gap:22px}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:12px 72px;display:flex;flex-direction:column;gap:22px}
 h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;text-wrap:balance}
 .num{font-family:var(--display);font-variant-numeric:tabular-nums}
 button{font:inherit;cursor:pointer;color:inherit;background:none;border:none;padding:0}
@@ -82,9 +82,9 @@ input:focus{border-color:var(--mint)}
 .label{font-size:12px;color:var(--muted);letter-spacing:.02em}
 
 /* header */
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;min-height:34px;margin-bottom:-10px;padding-inline:2px}
 .brand{display:flex;align-items:center;gap:10px}
-.brand .logo{width:32px;height:32px;flex:none;display:block;transform-origin:50% 50%;animation:pinwheel 9s linear infinite}
+.brand .logo{width:30px;height:30px;flex:none;display:block;transform-origin:50% 50%;animation:pinwheel 9s linear infinite}
 /* spins like a pinwheel: a steady turn, then a gust whips it round before it slows again */
 @keyframes pinwheel{0%{transform:rotate(0deg)}35%{transform:rotate(80deg)}48%{transform:rotate(250deg);animation-timing-function:ease-out}70%{transform:rotate(330deg)}100%{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.brand .logo{animation:none}}
@@ -366,7 +366,7 @@ label.f{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--
 /* web-app shell */
 html,body{margin:0}
 *{box-sizing:border-box}
-.wrap{padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+.wrap{padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 .backup{display:flex;justify-content:center;gap:14px;font-size:12px;color:var(--muted);padding-top:8px}
 .backup button{background:none;border:0;padding:4px 2px;color:inherit;font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--line)}
 .backup button:hover{color:var(--fg)}
