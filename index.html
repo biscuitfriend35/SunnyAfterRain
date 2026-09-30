@@ -271,6 +271,11 @@ label.f{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--
 /* sheet */
 .scrim{position:fixed;inset:0;background:rgba(8,20,16,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10;padding:16px}
 .scrim[hidden]{display:none}
+@media (pointer: coarse){
+  body.adding .wrap{display:none}
+  body.adding .scrim{position:static;inset:auto;background:var(--bg);display:block;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 80px}
+  body.adding .sheet{max-width:none;max-height:none;overflow:visible;border:1.5px solid var(--line)}
+}
 @media (min-width:620px){.scrim{align-items:center}}
 .sheet{background:var(--surface);border-radius:26px;width:100%;max-width:520px;max-height:calc(100% - 8px);overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
 .sheet-head{display:flex;justify-content:space-between;align-items:center}
@@ -385,7 +390,7 @@ html,body{margin:0}
   </div>
   <div class="notice" id="notice" hidden></div>
   <main id="app"><div class="empty"><strong>화분 세는 중…</strong>잠깐만 기다려.</div></main>
-  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v0930.0413</span></footer>
+  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v0930.0418</span></footer>
 </div>
 
 <div class="scrim" id="scrim" hidden>
@@ -1357,11 +1362,18 @@ html,body{margin:0}
     Object.assign(add, {type:'ficus', seed:distinctSeed('ficus', c0), manual:false, color:c0, winterManual:false});
     $('#addForm').reset(); $('#addInterval').value = 7; $('#addWinter').value = 14; $('#addLast').value = todayStr(); $('#addLast').max = todayStr();
     drawAdd(); $('#scrim').hidden = false;
-    // Focus right here, inside the tap that opened the sheet: iOS only raises the keyboard for a focus() made
-    // during a user gesture (a delayed focus() leaves the field focused with no keyboard).
-    try { $('#addName').focus({preventScroll: true}); } catch(_) {}
+    // On phones the form opens as its own page in normal document flow instead of a fixed overlay:
+    // iOS home-screen apps can refuse the keyboard for inputs inside position:fixed layers.
+    // No programmatic focus on phones either; the user's own tap on the field raises the keyboard.
+    if(matchMedia('(pointer: coarse)').matches){ addScrollY = window.scrollY; document.body.classList.add('adding'); window.scrollTo(0, 0); }
+    else setTimeout(() => $('#addName').focus(), 30);
   }
-  const closeAdd = () => { $('#scrim').hidden = true; };
+  let addScrollY = 0;
+  const closeAdd = () => {
+    if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    $('#scrim').hidden = true;
+    if(document.body.classList.contains('adding')){ document.body.classList.remove('adding'); window.scrollTo(0, addScrollY); }
+  };
   $('#addClose').addEventListener('click', closeAdd);
   $('#scrim').addEventListener('click', e => { if(e.target.id==='scrim') closeAdd(); });
   document.addEventListener('keydown', e => { if(e.key==='Escape' && !$('#scrim').hidden) closeAdd(); });
