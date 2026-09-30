@@ -1147,7 +1147,7 @@ html,body{margin:0}
     const need = rows.filter(r=>r.s.kind==='late'||r.s.kind==='due'||r.s.kind==='none');
     let banner;
     const hi = welcome(), sub = t => `<p>${t}</p>`;
-    if(!rows.length) banner = `<div><h2>${hi}</h2>${sub('식물 하나만 데려오면 물 줄 날은 내가 챙길게.')}${wxFresh()?wxLine():''}</div><button class="btn bn-cta" data-act="add">+ 식물 추가</button>`;
+    if(!rows.length) banner = `<div><h2>${hi}</h2>${sub('식물 하나만 데려오면 물 줄 날은 내가 챙길게.')}${wxFresh()?wxLine():''}</div>`;
     else if(!need.length) banner = `<div><h2>${hi}</h2>${sub(`다들 아직 촉촉해. 다음 급수는 ${md(rows[0].s.next)}.`)}${wxFresh()?wxLine():''}</div>`;
     else banner = `<div><h2>${hi}</h2>${wxFresh()?wxLine():''}</div><div class="chips">${need.map(r=>`<button data-act="open" data-id="${r.p.id}" class="${r.s.kind==='late'?'late':''}">${esc(r.p.name)} · ${r.s.label}</button>`).join('')}</div>`;
 
