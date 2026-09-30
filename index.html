@@ -1350,7 +1350,10 @@ html,body{margin:0}
     const c0 = freeColor();
     Object.assign(add, {type:'ficus', seed:distinctSeed('ficus', c0), manual:false, color:c0, winterManual:false});
     $('#addForm').reset(); $('#addInterval').value = 7; $('#addWinter').value = 14; $('#addLast').value = todayStr(); $('#addLast').max = todayStr();
-    drawAdd(); $('#scrim').hidden = false; setTimeout(()=>$('#addName').focus(), 30);
+    drawAdd(); $('#scrim').hidden = false;
+    // Only auto-focus with a mouse. On phones (iOS especially) a focus() fired outside the tap leaves the field
+    // focused without a keyboard, and tapping the already-focused field then never brings the keyboard up.
+    if(matchMedia('(pointer: fine)').matches) setTimeout(()=>$('#addName').focus(), 30);
   }
   const closeAdd = () => { $('#scrim').hidden = true; };
   $('#addClose').addEventListener('click', closeAdd);
