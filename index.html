@@ -384,7 +384,11 @@ html,body{margin:0}
 
 <script>
 // ?debug : on-screen trace of focus / keyboard / touch events, for chasing device-only bugs
-if(/[?&]debug/.test(location.search)){
+// tap the version label 5 times to toggle debug inside the home-screen app (no URL bar there)
+document.addEventListener('click', e => { if(!e.target.closest('.ver')) return; window.__vt = (window.__vt||0) + 1;
+  if(window.__vt >= 5){ window.__vt = 0; try{ const on = localStorage.getItem('after-rain:debug')==='1'; localStorage.setItem('after-rain:debug', on ? '0' : '1'); }catch(_){} location.reload(); } });
+let __dbg = /[?&]debug/.test(location.search); try{ if(localStorage.getItem('after-rain:debug')==='1') __dbg = true; }catch(_){}
+if(__dbg){
   const box = document.createElement('pre');
   box.style.cssText = 'position:fixed;left:0;right:0;bottom:0;max-height:38vh;overflow:auto;margin:0;padding:6px 8px;background:rgba(0,0,0,.82);color:#9ff;font:11px/1.35 ui-monospace,monospace;z-index:99;white-space:pre-wrap;pointer-events:none';
   document.addEventListener('DOMContentLoaded', () => document.body.appendChild(box));
@@ -395,7 +399,7 @@ if(/[?&]debug/.test(location.search)){
   document.addEventListener('touchstart', e => setTimeout(() => { if(e.defaultPrevented) log('touchstart was prevented'); }, 0), true);
   if(window.visualViewport) visualViewport.addEventListener('resize', () => log('viewport h='+Math.round(visualViewport.height)));
   window.addEventListener('blur', () => log('window blur')); window.addEventListener('focus', () => log('window focus'));
-  log('debug on · ' + navigator.userAgent.slice(0, 80));
+  log('debug on · standalone=' + !!navigator.standalone + ' · ' + (document.querySelector('.ver')||{}).textContent);
   // a bare test field outside every app container: does the keyboard come up here?
   document.addEventListener('DOMContentLoaded', () => {
     const t = document.createElement('input'); t.id = 'dbgInput'; t.placeholder = '테스트 입력칸 (앱 바깥)';
@@ -415,7 +419,7 @@ if(/[?&]debug/.test(location.search)){
   </div>
   <div class="notice" id="notice" hidden></div>
   <main id="app"><div class="empty"><strong>화분 세는 중…</strong>잠깐만 기다려.</div></main>
-  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v0930.0428</span></footer>
+  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v0930.0438</span></footer>
 </div>
 
 <div class="scrim" id="scrim" hidden>
