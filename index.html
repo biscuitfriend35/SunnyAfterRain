@@ -392,7 +392,7 @@ html,body{margin:0}
   </div>
   <div class="notice" id="notice" hidden></div>
   <main id="app"><div class="empty"><strong>화분 세는 중…</strong>잠깐만 기다려.</div></main>
-  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v0930.0501</span></footer>
+  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v1001.0708</span></footer>
 </div>
 
 <div class="scrim" id="scrim" hidden>
@@ -1063,42 +1063,118 @@ html,body{margin:0}
     st.textContent = `.wx-rain{background-image:${rainA},${rainB}}.wx-snow{background-image:${snowA},${snowB}}`;
     document.head.appendChild(st);
   })();
-  // banner greeting: changes every hour. Lines come from the time of day (+ weather when we have it);
-  // the day's order is shuffled once and walked hour by hour, so the same line never shows twice in a row.
+  // banner greeting: a fresh line every hour. Lines come from the time of day, the weekday, the season,
+  // a few dates, the weather and a big any-time pool; what was shown recently is remembered (this browser)
+  // so the same line doesn't come back for a long while.
   const HELLO = {
-    morning: ['눈 떴으면 반은 성공한 거야','알람 몇 번 껐어? 솔직하게','아침밥 대신 커피? 그거 밥 아니다','출근길 표정 관리 부탁해','좋은 아침! 이불 밖은 위험했지?','세수는 했지? 아 됐어, 안 물어볼게','지각할 것 같으면 일단 뛰어','오늘의 운세: 커피 한 잔이면 대길'],
-    noon: ['점심 뭐 먹었어? 부러우면 지는 거고','밥 먹고 졸린 건 소화의 증거야','메뉴 고민 5분, 먹는 건 10분','점심시간은 왜 이렇게 빨리 가냐','오늘 점심은 탄수화물 파티였지?'],
-    afternoon: ['오후 3시 졸음은 과학이야, 네 탓 아님','퇴근까지 버티기 모드 ON','딴짓 들킬 뻔했지? 모른 척해줄게','당 떨어질 시간이다, 간식 허가','시계 그만 봐, 안 빨라져','기지개 한 번 켜. 아무도 안 봐'],
-    evening: ['퇴근했으면 오늘 할 일은 끝이야','오늘도 살아남았네, 박수 짝짝','저녁 메뉴 고르기가 제일 큰 업무지','소파가 널 부르고 있어','야근이면… 조용히 응원할게','배달앱 켜는 소리 들렸다','오늘 수고했어. 진심이야'],
-    night: ['이 시간에 뭐 해, 얼른 자','야식은 참아… 아니 오늘만 먹어','새벽 감성 주의보 발령','내일의 너한테 미안하지 않게 자자','유튜브 한 개만 더? 그거 거짓말인 거 알지','폰 내려놓고 눈 좀 붙여'],
+    any: [
+      '오늘도 출석 완료, 박수 짝짝','물 마셨어? 식물 말고 너 말이야','어깨 펴, 거북목 경보 울렸어','오늘의 운세: 대충 해도 대길',
+      '할 일 목록은 원래 안 끝나는 거야','숨 한 번 크게 쉬어, 공짜야','지금 표정 그대로 3초 유지. 좋아','오늘 칭찬 하나 미리 줄게. 잘했어',
+      '아무것도 안 하는 것도 재능이야','미뤄도 돼, 근데 물은 미루지 마','오늘 너 좀 괜찮은데?','기분이 별로면 간식이 답이야',
+      '인생은 타이밍, 물 주기도 타이밍','폰 그만 보라고 폰이 말하는 중','너무 열심히 살지 마, 적당히가 최고','오늘의 목표: 무사히 퇴근 혹은 무사히 잠',
+      '지금 이 앱 연 거 칭찬해','물 한 컵 원샷 하고 와','스트레칭 10초만, 진짜 10초','웃으면 복이 와, 안 와도 웃자',
+      '세상에 급한 일은 생각보다 적어','오늘 운동은 계단 한 층으로 퉁치자','잘하고 있어. 증거는 없지만 믿어','기지개 켜면 키 1mm 큼(아님)',
+      '좋은 일은 갑자기 와. 오늘일지도','커피 몇 잔째야? 솔직하게','휴식도 일이야, 제일 중요한 일','오늘 하늘 한 번은 올려다보기',
+      '세탁기 돌려놓고 까먹은 거 없지?','지갑, 폰, 열쇠. 다 있지?','충전기 꽂아. 너도 폰도','잘 먹고 잘 자는 게 제일 어려워',
+      '누가 뭐래도 오늘의 주인공은 너','망해도 괜찮아, 내일 또 하면 돼','오늘은 나에게 관대해지는 날','물 주러 왔다가 힐링하고 가',
+      '초록이 보면 눈이 쉬어. 실컷 봐','작은 일 하나 끝내면 오늘 성공','이불 정리만 해도 반은 한 거야','오늘 들은 칭찬 저장해둬',
+      '모르는 건 모른다고 해도 돼','잠깐 멍 때리기 허가','오늘 웃긴 일 하나만 찾아봐','남의 화분이 커 보여도 신경 꺼',
+      '배고프면 예민해져, 뭐 좀 먹어','물 줬다고 생색내도 돼, 내가 봐줄게','오늘 할 일: 살아있기. 이미 달성','따뜻한 거 한 잔 하자',
+      '오늘 날씨보다 네 기분이 중요해','고민은 내일의 나한테 토스','반가워! 또 왔네','어서 와, 식물들이 기다렸어',
+    ],
+    morning: [
+      '눈 떴으면 반은 성공한 거야','알람 몇 번 껐어? 솔직하게','아침밥 대신 커피? 그거 밥 아니다','출근길 표정 관리 부탁해',
+      '좋은 아침! 이불 밖은 위험했지?','세수는 했지? 아 됐어, 안 물어볼게','지각할 것 같으면 일단 뛰어','오늘의 운세: 커피 한 잔이면 대길',
+      '아침 햇빛 5분이면 기분 +10','일어난 너, 오늘 MVP 후보','5분만 더… 가 30분 된 거 알아','양치하면서 이거 보는 중이지?',
+      '아침 공기 맛있다, 창문 열어봐','오늘 옷 잘 골랐어. 아마도','출근 지하철 자리 운 빌어줄게','아침엔 물 한 컵부터',
+      '모닝 루틴: 눈 뜨기, 끝','아직 눈 반쯤 감겨 있는 거 다 보여','부지런한 새가 벌레를 잡지. 넌 커피 잡아','오늘 첫 미소 여기서 쓰고 가',
+      '아침부터 이 앱 켠 너 성실해','밤새 식물들 안 싸웠어, 걱정 마','토스트 탄 거 아니지?','아침 회의 있으면 미리 위로할게',
+    ],
+    noon: [
+      '점심 뭐 먹었어? 부러우면 지는 거고','밥 먹고 졸린 건 소화의 증거야','메뉴 고민 5분, 먹는 건 10분','점심시간은 왜 이렇게 빨리 가냐',
+      '오늘 점심은 탄수화물 파티였지?','국물 있는 거 먹었으면 성공','점심 먹고 산책 10분 어때','디저트 배는 따로 있는 거 인정',
+      '아직 점심 안 먹었으면 지금 당장','배부르면 일단 한숨 돌려','오후를 버틸 연료 충전 완료?','점심 메뉴 실패해도 저녁이 있어',
+    ],
+    afternoon: [
+      '오후 3시 졸음은 과학이야, 네 탓 아님','퇴근까지 버티기 모드 ON','딴짓 들킬 뻔했지? 모른 척해줄게','당 떨어질 시간이다, 간식 허가',
+      '시계 그만 봐, 안 빨라져','기지개 한 번 켜. 아무도 안 봐','눈 깜빡이는 거 잊지 마','오후엔 물 한 잔 더',
+      '집중력 바닥났으면 3분만 쉬어','커피 한 잔 더? 밤잠은 책임 못 져','지금 하는 거 잘 될 거야','오후 햇살에 광합성 좀 해',
+      '창밖 한 번 보고 와, 눈 쉬게','회의가 길면 마음속으로 식물 생각','이메일은 도망 안 가','반나절 버틴 거 대단해',
+      '하품 참지 마, 건강에 안 좋아','오후의 나른함 = 행복의 다른 이름','간식 서랍 열 시간이야',
+    ],
+    evening: [
+      '퇴근했으면 오늘 할 일은 끝이야','오늘도 살아남았네, 박수 짝짝','저녁 메뉴 고르기가 제일 큰 업무지','소파가 널 부르고 있어',
+      '야근이면… 조용히 응원할게','배달앱 켜는 소리 들렸다','오늘 수고했어. 진심이야','씻는 게 제일 귀찮은 시간',
+      '저녁엔 맛있는 거 먹을 자격 있어','오늘 하루 몇 점? 후하게 줘','드라마 한 편만, 진짜 한 편만','퇴근길 노을 봤어?',
+      '저녁 산책하기 딱 좋은 시간','라면 끓일 거면 계란 넣어','오늘 고생한 너한테 박수','집이 최고야, 반박 불가',
+      '저녁 먹고 바로 누우면 소 돼. 괜찮아','설거지는 내일의 내가 할 거야','오늘 있었던 좋은 일 하나 떠올려봐','이제 진짜 쉬는 시간이야',
+    ],
+    night: [
+      '이 시간에 뭐 해, 얼른 자','야식은 참아… 아니 오늘만 먹어','새벽 감성 주의보 발령','내일의 너한테 미안하지 않게 자자',
+      '유튜브 한 개만 더? 그거 거짓말인 거 알지','폰 내려놓고 눈 좀 붙여','새벽에 쓴 메시지는 아침에 보내','잠 안 오면 양 말고 화분 세봐',
+      '지금 자면 몇 시간 잘 수 있는지 계산 금지','밤에는 고민이 2배로 커 보여. 착시야','식물들도 자는 중이야, 쉿','이불 덮고 따뜻하게 자',
+      '오늘 일은 오늘로 끝, 로그아웃','새벽 라면은 맛있지만 내일 부어','불 끄고 폰 화면 밝기도 꺼','꿈에서 만나자, 물뿌리개 들고',
+    ],
+    mon: ['월요일이다… 힘내 진짜','월요병엔 약이 없어, 버티기뿐','월요일 아침은 원래 무거워','한 주의 시작, 일단 커피부터'],
+    fri: ['금요일이다! 주말까지 조금만','불금 계획 세웠어?','금요일 오후는 사실상 주말','이번 주도 끝까지 왔다, 장해'],
+    weekend: ['주말엔 아무것도 안 해도 돼','늦잠 잤어? 잘했어','주말엔 화분 구경하는 날','주말 브런치 각이다','쉬는 날엔 쉬는 게 일이야'],
+    sunday_night: ['일요일 밤의 그 기분, 알지?','내일 월요일인 거 잠깐 잊자'],
+    spring: ['봄이다, 새싹들 신났어','꽃가루 조심, 재채기 조심','봄바람 불면 괜히 설레지'],
+    summer: ['여름엔 물 자주 마셔, 너도 식물도','에어컨 바람에 식물도 목말라','수박 먹고 싶은 날씨다'],
+    fall: ['가을이다, 하늘 높은 거 봤어?','책 읽기 좋은 계절… 이라고들 해','선선해서 산책하기 딱 좋다'],
+    winter: ['겨울엔 식물도 쉬엄쉬엄','손 시리면 주머니에 쏙','붕어빵 파는 곳 알면 알려줘'],
+    rain: ['우산 챙겼지? 안 챙겼으면 뛰어','비 오는 날엔 파전이 국룰','빗소리 ASMR 무료 제공 중','비 오는 날은 집이 최고','오늘 베란다 식물들은 신났겠다','양말 젖으면 기분도 젖어'],
+    thunder: ['천둥 치는 날엔 이불 속이 최고야','번쩍! 방금 사진 찍힌 거 아님','오늘은 밖에 나가지 마','콘센트 조심, 마음도 조심'],
+    snow: ['눈 온다! 강아지 모드 ON','눈사람 만들 사람 손','미끄러지지 마, 폼 안 나','눈 오는 날은 괜히 설레'],
+    clear_day: ['날씨 미쳤다, 창문 열어봐','이런 날 일하는 거 불법 아니야?','햇빛 좋다, 빨래하기 딱','선크림 발랐어?','이런 날은 밖에 나가야 해'],
+    clear_night: ['달 예쁘다. 너 말고 달','별 보일지도? 고개 한 번 들어봐','밤공기 시원하다'],
+    cloudy: ['구름 좀 꼈네, 선크림은 발라','구름이 그림 같다, 한 번 봐'],
+    overcast: ['하늘도 월요병인가 봐','흐린 날엔 커피가 두 배로 맛있지','흐린 날은 조명 켜고 아늑하게'],
+    fog: ['안 보이는 건 안개 탓이야, 인생 탓 아님','운전하면 천천히, 안개 짙어'],
+    hot: ['밖은 찜질방이야, 나가지 마','아이스크림 하나 허가','더위 먹지 마, 물 많이'],
+    cold: ['손 시리지? 핫팩 챙겨','따뜻하게 입어, 감기 조심','이불 밖은 진짜 위험해'],
+    newyear: ['새해 복 많이 받아!','올해도 잘 부탁해, 너도 식물도'],
+    xmas: ['메리 크리스마스!','산타 대신 내가 물 줄게'],
+    halloween: ['해피 할로윈! 사탕 줄래?'],
+    valentine: ['초콜릿 받았어? 내가 줄게'],
+    payday: ['월급날이다! 통장 스치는 소리','오늘은 치킨 먹어도 돼'],
+    monthstart: ['새로운 달이다, 리셋!','이번 달도 잘 부탁해'],
   };
   function welcome(){
-    const d = new Date(), h = d.getHours();
+    const d = new Date(), h = d.getHours(), m = d.getMonth()+1, dd = d.getDate(), wd = d.getDay();
     const slot = h>=5&&h<11 ? 'morning' : h>=11&&h<14 ? 'noon' : h>=14&&h<18 ? 'afternoon' : h>=18&&h<23 ? 'evening' : 'night';
-    let pool = [...HELLO[slot]];
-    if(d.getDay()===1 && h<18) pool.push('월요일이다… 힘내 진짜');
-    if(d.getDay()===5 && h>=12) pool.push('금요일이다! 주말까지 조금만');
-    if(d.getDay()===0 || d.getDay()===6) pool.push('주말엔 아무것도 안 해도 돼');
+    const key = `${todayStr()}-${h}`;
+    // the same line for the whole hour
+    let mem = {}; try { mem = JSON.parse(localStorage.getItem('after-rain:hello')) || {}; } catch(_) {}
+    if(mem.key === key && mem.line) return mem.line;
+    // weighted pool: things about right now count more than the any-time lines
+    const pool = [], add = (arr, w=1) => { for(const s of arr||[]) for(let i=0;i<w;i++) pool.push(s); };
+    add(HELLO.any); add(HELLO[slot], 2);
+    if(wd===1 && h<18) add(HELLO.mon, 2);
+    if(wd===5 && h>=12) add(HELLO.fri, 2);
+    if(wd===0 || wd===6) add(HELLO.weekend, 2);
+    if(wd===0 && h>=18) add(HELLO.sunday_night, 2);
+    add(HELLO[[12,1,2].includes(m) ? 'winter' : m<=5 ? 'spring' : m<=8 ? 'summer' : 'fall']);
+    if(m===1 && dd===1) add(HELLO.newyear, 6);
+    if(m===12 && (dd===24 || dd===25)) add(HELLO.xmas, 6);
+    if(m===10 && dd===31) add(HELLO.halloween, 6);
+    if(m===2 && dd===14) add(HELLO.valentine, 6);
+    if(dd===25) add(HELLO.payday, 3);
+    if(dd===1) add(HELLO.monthstart, 3);
     if(wxFresh()){
-      const sky = skyOf(weather.symbol), night = phase()==='night' || phase()==='dusk', t = Number(weather.temp);
-      const byWx = {
-        rain: ['우산 챙겼지? 안 챙겼으면 뛰어','비 오는 날엔 파전이 국룰','빗소리 ASMR 무료 제공 중'],
-        thunder: ['천둥 치는 날엔 이불 속이 최고야','번쩍! 방금 사진 찍힌 거 아님'],
-        snow: ['눈 온다! 강아지 모드 ON','눈사람 만들 사람 손','미끄러지지 마, 폼 안 나'],
-        clear: night ? ['달 예쁘다. 너 말고 달'] : ['날씨 미쳤다, 창문 좀 열어봐','이런 날 일하는 거 불법 아니야?'],
-        fair: night ? ['별 보일지도? 고개 한 번 들어봐'] : ['하늘 파란 거 봤어? 한 번 봐'],
-        cloudy: ['구름 좀 꼈네, 선크림은 발라'],
-        overcast: ['하늘도 월요병인가 봐','흐린 날엔 커피가 두 배로 맛있지'],
-        fog: ['안 보이는 건 안개 탓이야, 인생 탓 아님'],
-      }[sky] || [];
-      pool.push(...byWx);
-      if(t>=30) pool.push('밖은 찜질방이야, 나가지 마');
-      if(t<=0) pool.push('손 시리지? 핫팩 챙겨');
+      const sky = skyOf(weather.symbol), dark = ['night','dusk'].includes(phase()), t = Number(weather.temp);
+      const k = sky==='clear'||sky==='fair' ? (dark ? 'clear_night' : 'clear_day') : sky;
+      add(HELLO[k], 2);
+      if(t>=28) add(HELLO.hot, 2);
+      if(t<=5) add(HELLO.cold, 2);
     }
-    // shuffle with a per-day seed, then take the hour's position
-    const R = rng(hashStr(todayStr() + slot + pool.length));
-    for(let i=pool.length-1;i>0;i--){ const j = Math.floor(R()*(i+1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-    return pool[h % pool.length];
+    // skip anything shown recently; fall back to the whole pool if that empties it
+    const recent = new Set(Array.isArray(mem.recent) ? mem.recent : []);
+    let choices = pool.filter(s => !recent.has(s));
+    if(!choices.length) choices = pool;
+    const line = choices[Math.floor(Math.random() * choices.length)];
+    try { localStorage.setItem('after-rain:hello', JSON.stringify({key, line, recent: [line, ...recent].slice(0, 80)})); } catch(_) {}
+    return line;
   }
   function wxLine(){
     const sky = skyOf(weather.symbol), h = Math.floor((Date.now() - Date.parse(weather.updatedAt))/36e5);
