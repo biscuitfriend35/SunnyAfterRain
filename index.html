@@ -70,10 +70,10 @@ body.typing *,body.typing *::before,body.typing *::after{animation-play-state:pa
 .btn.lime{background:var(--lime);border-color:var(--lime);color:var(--on-lime)}
 .btn.lime:hover{filter:brightness(.96)}
 .btn.wbtn{background:var(--idle);border-color:var(--idle);color:var(--idle-fg)}
-.btn.wbtn:hover{background:var(--idle-hover);border-color:var(--idle-hover);color:var(--mint-deep);filter:none}
+@media (hover:hover) and (pointer:fine){.btn.wbtn:hover{background:var(--idle-hover);border-color:var(--idle-hover);color:var(--mint-deep);filter:none}}
 .btn.wbtn.on{background:var(--lime);border-color:var(--lime);color:var(--on-lime)}
 .btn.wbtn .undo{font-size:12px;font-weight:600;opacity:.6;margin-left:4px;padding-left:8px;border-left:1.5px solid currentColor}
-.btn.wbtn.on:hover{background:var(--late-soft);border-color:var(--late-soft);color:var(--late)}
+@media (hover:hover) and (pointer:fine){.btn.wbtn.on:hover{background:var(--late-soft);border-color:var(--late-soft);color:var(--late)}}
 .btn.ghost{border-color:transparent;background:none;color:var(--muted);padding-inline:10px}
 .btn.ghost:hover{color:var(--fg)}
 .btn.danger{border-color:var(--late);color:var(--late)}
@@ -178,9 +178,9 @@ body.dragging-any .pcard.late:hover{border-color:var(--late)}
 .hero .since.today b{font-size:34px}
 .pcard .row{display:flex;justify-content:space-between;align-items:center;gap:6px}
 .qw{width:34px;height:34px;border-radius:50%;background:var(--idle);color:var(--idle-fg);display:grid;place-items:center;flex:none;transition:background .15s,color .15s}
-.qw:hover{background:var(--idle-hover);color:var(--mint-deep)}
+@media (hover:hover) and (pointer:fine){.qw:hover{background:var(--idle-hover);color:var(--mint-deep)}}
 .qw.on{background:var(--lime);color:var(--on-lime)}
-.qw.on:hover{background:var(--late-soft);color:var(--late)}
+@media (hover:hover) and (pointer:fine){.qw.on:hover{background:var(--late-soft);color:var(--late)}}
 .qw svg{width:16px;height:16px}
 .addcard{border:1.5px dashed var(--mint);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:200px;color:var(--mint-deep);font-weight:600}
 .addcard .plus{width:40px;height:40px;border-radius:50%;background:var(--mint-soft);display:grid;place-items:center;font-size:22px}
@@ -392,7 +392,7 @@ html,body{margin:0}
   </div>
   <div class="notice" id="notice" hidden></div>
   <main id="app"><div class="empty"><strong>화분 세는 중…</strong>잠깐만 기다려.</div></main>
-  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v1001.0714</span></footer>
+  <footer class="backup" id="backup"><button type="button" data-bk="save">백업 파일 저장</button><button type="button" data-bk="load">백업 불러오기</button><input type="file" id="bkFile" accept="application/json,.json" hidden><span class="ver">v1023.0701</span></footer>
 </div>
 
 <div class="scrim" id="scrim" hidden>
